@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:route_draw_for_strava/button_click_counter_widget.dart';
-import 'package:route_draw_for_strava/placeholder_widget.dart';
+import 'package:route_draw_for_strava/utility_widgets.dart';
 import 'package:route_draw_for_strava/settings_widget.dart';
+import 'package:route_draw_for_strava/home_menu.dart';
 
 class HomePage extends StatefulWidget {
   // This widget is the home page of your application. It is stateful, meaning
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
-  final List<Widget> _children = [ButtonClickCounterWidget(), SettingsWidget()];
+  final List<Widget> _children = [HomeMenuWidget(), SettingsWidget()];
 
   @override
   Widget build(BuildContext context) {

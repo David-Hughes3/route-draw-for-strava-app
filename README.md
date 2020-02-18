@@ -10,7 +10,14 @@ The Strava mobile app allows a user to create an activity, but it down not allow
 gpx file or draw their own route. I recently ran into this issue myself where my GPS watch was inaccurate,
 so the image of the route was both misleading and frustrating to me.
 
-## Getting Started
+## Secrets
+
+in lib/secret.dart
+```
+final String secret = "[Strava API client secret]"; final String clientId = "[Strava API appID]";
+```
+
+## Flutter Starting Demo App Info
 
 This project is a starting point for a Flutter application.
 
