@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class RouteDrawWidget extends StatefulWidget {
   @override
@@ -6,12 +10,10 @@ class RouteDrawWidget extends StatefulWidget {
 }
 
 class _RouteDrawWidgetState extends State<RouteDrawWidget> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  Completer<GoogleMapController> _controller = Completer();
+  static const LatLng _center = const LatLng(45.521563, -122.677433);
+  void _onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
   }
 
   @override
@@ -20,12 +22,11 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       appBar: AppBar(
         title: Text("Route Draw"),
       ),
-      body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 11.0,
         ),
       ),
     );

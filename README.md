@@ -17,6 +17,17 @@ in lib/secret.dart
 final String secret = "[Strava API client secret]"; final String clientId = "[Strava API appID]";
 ```
 
+substitute Google api key in ios/Runner/AppDelegate.swift
+```
+<meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR KEY HERE"/>
+```
+
+substitute Google api key in android/app/src/main/AndroidManifest.xml
+```
+GMSServices.provideAPIKey("YOUR KEY HERE")
+```
+
 ## Flutter Starting Demo App Info
 
 This project is a starting point for a Flutter application.
