@@ -16,19 +16,41 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     _controller.complete(controller);
   }
 
+  MapType _currentMapType = MapType.normal;
+
+  void _onMapTypeButtonPressed() {
+    setState(() {
+      _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Route Draw"),
-      ),
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 11.0,
+        appBar: AppBar(
+          title: Text("Route Draw"),
         ),
-      ),
-    );
+        body: Stack(children: <Widget>[
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: _center,
+              zoom: 11.0,
+            ),
+            mapType: _currentMapType,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                onPressed: _onMapTypeButtonPressed,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                backgroundColor: Colors.green,
+                child: const Icon(Icons.map, size: 36.0),
+              ),
+            ),
+          ),
+        ]));
   }
 }
