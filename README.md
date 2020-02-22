@@ -14,7 +14,9 @@ so the image of the route was both misleading and frustrating to me.
 
 in lib/secret.dart
 ```
-final String secret = "[Strava API client secret]"; final String clientId = "[Strava API appID]";
+final String secret = "[Strava API client secret]";
+final String clientId = "[Strava API appID]";
+final String GOOGLE_MAPS_API_KEY = "YOUR KEY HERE";
 ```
 
 substitute Google api key in ios/Runner/AppDelegate.swift

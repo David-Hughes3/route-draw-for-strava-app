@@ -64,18 +64,32 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.3"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.8"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_datetime_picker:
+    dependency: "direct main"
+    description:
+      name: flutter_datetime_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.4"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -86,13 +100,34 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geolocator:
+    dependency: "direct main"
+    description:
+      name: geolocator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.2.1"
+  google_api_availability:
+    dependency: transitive
+    description:
+      name: google_api_availability
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
+  google_map_polyline:
+    dependency: "direct main"
+    description:
+      name: google_map_polyline
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0+1"
   google_maps_flutter:
     dependency: "direct main"
     description:
       name: google_maps_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.23+1"
+    version: "0.5.24+1"
   http:
     dependency: transitive
     description:
@@ -121,6 +156,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  location_permissions:
+    dependency: transitive
+    description:
+      name: location_permissions
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.4+1"
   matcher:
     dependency: transitive
     description:
@@ -162,7 +204,7 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   quiver:
     dependency: transitive
     description:
@@ -176,28 +218,28 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.6+1"
+    version: "0.5.6+2"
   shared_preferences_macos:
     dependency: transitive
     description:
       name: shared_preferences_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+5"
+    version: "0.0.1+6"
   shared_preferences_platform_interface:
     dependency: transitive
     description:
       name: shared_preferences_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.3"
   shared_preferences_web:
     dependency: transitive
     description:
       name: shared_preferences_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2+3"
+    version: "0.1.2+4"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -272,28 +314,28 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.1"
+    version: "5.4.2"
   url_launcher_macos:
     dependency: transitive
     description:
       name: url_launcher_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+2"
+    version: "0.0.1+4"
   url_launcher_platform_interface:
     dependency: transitive
     description:
       name: url_launcher_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   url_launcher_web:
     dependency: transitive
     description:
       name: url_launcher_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.1+1"
   vector_math:
     dependency: transitive
     description:
