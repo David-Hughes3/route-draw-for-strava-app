@@ -132,7 +132,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       var lastMarker = _markerHistory.removeLast();
       _markers.add(lastMarker);
 
-      if (_polylineHistory.isNotEmpty) {
+      if (_polylineHistory.isNotEmpty && _markers.length >= 2) {
         var lastPolyline = _polylineHistory.removeLast();
         _polylines.add(lastPolyline);
       }
