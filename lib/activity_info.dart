@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:route_draw_for_strava/upload_activity.dart';
+import 'map_utils.dart';
 
 class ActivityInfoWidget extends StatefulWidget {
-  ActivityInfoWidget(this.distance);
-  final double distance;
+  ActivityInfoWidget(this.coords);
+  final List<LatLng> coords;
   @override
-  _ActivityInfoState createState() => _ActivityInfoState(distance);
+  _ActivityInfoState createState() => _ActivityInfoState(coords);
 }
 
 class _ActivityInfoState extends State<ActivityInfoWidget> {
 
-  _ActivityInfoState(this._distance);
-  final double _distance;
+  _ActivityInfoState(this._coords);
+  final List<LatLng> _coords;
+  double _distance ;
+
+
+  @override
+  void initState(){
+    super.initState();
+    _distance = MapUtils.calcTotalDistance(_coords);
+  }
+
 
   void _toUploadActivity(BuildContext context) {
     Navigator.push(
@@ -33,7 +44,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
         ),
         body: Stack(children: <Widget>[
           Text(
-            'Upload Activity Distance $_distance'
+            'Upload Activity Distance ${_distance.toStringAsFixed(2)}'
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),

@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 
 import 'package:route_draw_for_strava/activity_info.dart';
 import 'package:route_draw_for_strava/secret.dart';
+import 'package:route_draw_for_strava/map_utils.dart';
 
 //reference to adding pin on press: https://stackoverflow.com/questions/57159415/how-does-drop-pins-with-long-press-on-google-map-with-flutter
 //reference to adding marker and polyline: https://stackoverflow.com/questions/53171531/how-to-add-polyline-on-google-maps-flutter-plugin
@@ -30,8 +31,8 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       new GoogleMapPolyline(apiKey: GOOGLE_MAPS_API_KEY);
 
   MapType _currentMapType = MapType.normal;
-  var _distance = 1.0;
-  var _units = 'mi';
+  var _distance = 0.0;
+  var _units = MapUtils.getUnitsAsString();
 
   var _curNavType = _navType.LINE;
   List<Marker> _markers = [];
@@ -80,6 +81,8 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
           width: 4,
         ));
       }
+
+      _distance =  _calcDistance();
     });
   }
 
@@ -97,7 +100,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       }
 
       //TODO
-      _distance = 0.0;
+      _distance =  _calcDistance();
     });
   }
 
@@ -117,7 +120,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       }
 
       //TODO
-      _distance = 0.0;
+      _distance =  _calcDistance();
     });
   }
 
@@ -135,7 +138,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       }
 
       //TODO
-      _distance = 0.0;
+      _distance =  _calcDistance();
     });
   }
 
@@ -153,16 +156,15 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
   }
 
   //TODO
-  void _updateDistance(double newDistance) {
-    setState(() {
-      _distance = 0.0;
-    });
+  double _calcDistance() {
+    var latlangs = MapUtils.polylinesToLatLngs(_polylines);
+    return MapUtils.calcTotalDistance(latlangs);
   }
 
   void _toActivityInfo(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ActivityInfoWidget(_distance)),
+      MaterialPageRoute(builder: (context) => ActivityInfoWidget(MapUtils.polylinesToLatLngs(_polylines))),
     );
   }
 
@@ -270,7 +272,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '$_distance $_units',
+                '${_distance.toStringAsFixed(2)} $_units',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,

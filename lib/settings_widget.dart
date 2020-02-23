@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:route_draw_for_strava/strava_wrapper.dart';
 import 'package:route_draw_for_strava/utility_widgets.dart';
+import 'package:route_draw_for_strava/map_utils.dart';
 
 class SettingsWidget extends StatefulWidget {
   @override
@@ -77,10 +78,27 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           Expanded(
               flex: 1,
               child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text('Select Units',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                        fontFamily: 'Roboto',
+                      )))),
+          Expanded(
+              flex: 1,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: _unitsSelectionWidgets(context),
+              )),
+          Expanded(
+              flex: 1,
+              child: Align(
                 alignment: Alignment.bottomCenter,
                 child:
                     Image.asset("assets/api_logo_pwrdBy_strava_horiz_gray.png"),
               )),
+
         ],
       );
   }
@@ -90,5 +108,60 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     setState(() {
       _isAuth = isAuth;
     });
+  }
+
+  void _updateUnits(Units input) {
+    setState(() {
+      MapUtils.setUnits(input);
+    });
+  }
+
+  Widget _unitsSelectionWidgets(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height * 0.05,
+            child: RaisedButton(
+              elevation: 5.0,
+              onPressed: () => _updateUnits(Units.KM),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(0.0))),
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.only(),
+                  child: Text('KM'),
+                ),
+              ),
+              color: [
+                Colors.grey[300],
+                Colors.white
+              ][MapUtils.getUnits().index],
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.05,
+            child: RaisedButton(
+              elevation: 5.0,
+              onPressed: () => _updateUnits(Units.MI),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(0.0))),
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.only(),
+                  child: Text('MI'),
+                ),
+              ),
+              color: [
+                Colors.white,
+                Colors.grey[300],
+              ][MapUtils.getUnits().index],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
