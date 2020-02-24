@@ -42,7 +42,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     List<LatLng> coords = [];
     if (_markers.length >= 1) {
       LatLng originPoint = _markers.last.position;
-      LatLng  destPoint = latlang;
+      LatLng destPoint = latlang;
 
       if (_curNavType == _navType.LINE) {
         coords = [originPoint, destPoint];
@@ -58,7 +58,6 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     }
 
     setState(() {
-
       _markerHistory = [];
       _polylineHistory = [];
 
@@ -82,7 +81,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
         ));
       }
 
-      _distance =  _calcDistance();
+      _distance = _calcDistance();
     });
   }
 
@@ -99,8 +98,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
         _polylines = [];
       }
 
-      //TODO
-      _distance =  _calcDistance();
+      _distance = _calcDistance();
     });
   }
 
@@ -119,8 +117,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
         _polylineHistory.add(lastPolyline);
       }
 
-      //TODO
-      _distance =  _calcDistance();
+      _distance = _calcDistance();
     });
   }
 
@@ -137,8 +134,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
         _polylines.add(lastPolyline);
       }
 
-      //TODO
-      _distance =  _calcDistance();
+      _distance = _calcDistance();
     });
   }
 
@@ -155,7 +151,6 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     ));
   }
 
-  //TODO
   double _calcDistance() {
     var latlangs = MapUtils.polylinesToLatLngs(_polylines);
     return MapUtils.calcTotalDistance(latlangs);
@@ -164,7 +159,9 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
   void _toActivityInfo(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ActivityInfoWidget(MapUtils.polylinesToLatLngs(_polylines))),
+      MaterialPageRoute(
+          builder: (context) =>
+              ActivityInfoWidget(MapUtils.polylinesToLatLngs(_polylines))),
     );
   }
 

@@ -1,11 +1,13 @@
 import 'dart:math';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum Units { KM, MI }
 
 class MapUtils {
-
   static MapUtils _instance;
   factory MapUtils() => _instance ??= new MapUtils._();
   MapUtils._();
@@ -15,21 +17,20 @@ class MapUtils {
   static void setUnits(Units input) {
     _whichUnit = input;
   }
+
   static Units getUnits() {
     return _whichUnit;
   }
 
   static String getUnitsAsString() {
     String units = "";
-    if (_whichUnit == Units.KM){
+    if (_whichUnit == Units.KM) {
       units = "KM";
-    }
-    else if (_whichUnit == Units.MI){
+    } else if (_whichUnit == Units.MI) {
       units = "MI";
     }
     return units;
   }
-
 
   static double calcTotalDistance(List<LatLng> input) {
     double total = _calcTotalDistance(input);
@@ -75,4 +76,36 @@ class MapUtils {
 
     return output;
   }
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/route.gpx');
+  }
+
+//  Future<File> toGPXFile(List<LatLng> coords) async {
+//    String name = 'Example';
+//
+//    String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"MapSource 6.15.5\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
+//    name = "<name>" + name + "</name><trkseg>\n";
+//
+//    String segments = "";
+//    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+//    for (Location location : points) {
+//      segments += "<trkpt lat=\"" + location.getLatitude() + "\" lon=\"" + location.getLongitude() + "\"><time>" + df.format(new Date(location.getTime())) + "</time></trkpt>\n";
+//    }
+//
+//    String footer = "</trkseg></trk></gpx>";
+//
+//
+//
+//    final file = await _localFile;
+//    // Write the file.
+//    return file.writeAsString('$counter');
+//  }
 }
