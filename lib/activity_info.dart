@@ -50,6 +50,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
@@ -126,7 +127,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                     flex: 1,
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: FlatButton(
+                      child: RaisedButton(
                           onPressed: () {
                             DatePicker.showDateTimePicker(context,
                                 showTitleActions: true,
@@ -147,15 +148,15 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                             }, currentTime: _date, locale: LocaleType.en);
                           },
                           child: Text(
-                            'Start date-time: ${_date.year}-${_date.month}-${_date.day} ${_date.hour.toString().padLeft(2, '0')}:${_date.minute.toString().padLeft(2, '0')}',
-                            style: TextStyle(color: Colors.blue),
+                            'Start date-time: ${_date.month}/${_date.day}/${_date.year} ${_date.hour.toString().padLeft(2, '0')}:${_date.minute.toString().padLeft(2, '0')}',
+                            style: TextStyle(color:  Colors.black,fontSize: 20.0, ),
                           )),
                     )),
                 Expanded(
                     flex: 1,
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: FlatButton(
+                      child: RaisedButton(
                           onPressed: () {
                             DatePicker.showTimePicker(
                               context,
@@ -171,7 +172,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                           },
                           child: Text(
                             'Elapsed Time: ${_elapsedTime.hour.toString().padLeft(2, '0')}:${_elapsedTime.minute.toString().padLeft(2, '0')}:${_elapsedTime.second.toString().padLeft(2, '0')}',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: Colors.black, fontSize: 20.0,),
                           )),
                     )),
                 Expanded(
@@ -198,18 +199,22 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                         ),
                       )),
                 ),
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 0.0, top: 0.0,  right: 16.0, bottom: 16.0),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: FloatingActionButton(
+                        onPressed: () => _toUploadActivity(context),
+                        tooltip: 'UploadActivity',
+                        child: Icon(Icons.check),
+                      ),
+                    ),
+                  ),
+                ),
               ]),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: () => _toUploadActivity(context),
-                tooltip: 'UploadActivity',
-                child: Icon(Icons.check),
-              ),
-            ),
-          ),
+
         ]));
   }
 }
