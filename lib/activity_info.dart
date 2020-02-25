@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 import 'package:route_draw_for_strava/upload_activity.dart';
 import 'map_utils.dart';
+import 'package:route_draw_for_strava/utility_widgets.dart';
 
 class ActivityInfoWidget extends StatefulWidget {
   ActivityInfoWidget(this.coords);
@@ -21,7 +24,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
   TextEditingController _controllerTitle;
   TextEditingController _controllerDesc;
   DateTime _elapsedTime;
-  DateTime _date;
+  DateTime _startDateTime;
 
   @override
   void initState() {
@@ -31,7 +34,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
     _controllerDesc = TextEditingController();
     _elapsedTime = DateTime(
         DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
-    _date = DateTime.now();
+    _startDateTime = DateTime.now();
   }
 
   void dispose() {
@@ -41,10 +44,27 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
   }
 
   void _toUploadActivity(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => UploadActivityWidget()),
-    );
+    if (_coords.length < 2) {
+      showPopupText(context, "Invalid Arguments",
+          "What kind of route just has a starting point?");
+      return;
+    }
+    if (_controllerTitle.text == null ||
+        _controllerTitle.text == "null" ||
+        _controllerTitle.text == "") {
+      showPopupText(context, "Invalid Arguments", "Enter A Activity Title");
+      return;
+    }
+
+    MapUtils.toGPXFile(_coords, _startDateTime, _elapsedTime)
+        .then((File gpxFile) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => UploadActivityWidget(
+                _controllerTitle.text, _controllerDesc.text, gpxFile.path)),
+      );
+    });
   }
 
   @override
@@ -131,25 +151,26 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                           onPressed: () {
                             DatePicker.showDateTimePicker(context,
                                 showTitleActions: true,
-                                minTime: DateTime(
-                                    DateTime.now().year - 5,
-                                    DateTime.now().month,
-                                    DateTime.now().day,
-                                    0,
-                                    0,
-                                    0),
+                                minTime: DateTime.now().add(new Duration(
+                                    days:
+                                        -1825)), //minimum time to scroll to is 5 years ago
                                 maxTime: DateTime.now()
                                     .add(new Duration(seconds: 1)),
                                 onConfirm: (date) {
                               print('confirm $date');
                               setState(() {
-                                _date = date;
+                                _startDateTime = date;
                               });
-                            }, currentTime: _date, locale: LocaleType.en);
+                            },
+                                currentTime: _startDateTime,
+                                locale: LocaleType.en);
                           },
                           child: Text(
-                            'Start date-time: ${_date.month}/${_date.day}/${_date.year} ${_date.hour.toString().padLeft(2, '0')}:${_date.minute.toString().padLeft(2, '0')}',
-                            style: TextStyle(color:  Colors.black,fontSize: 20.0, ),
+                            'Start date-time: ${new DateFormat("MM/dd/yy h:mm a").format(_startDateTime)}',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20.0,
+                            ),
                           )),
                     )),
                 Expanded(
@@ -171,8 +192,11 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                             );
                           },
                           child: Text(
-                            'Elapsed Time: ${_elapsedTime.hour.toString().padLeft(2, '0')}:${_elapsedTime.minute.toString().padLeft(2, '0')}:${_elapsedTime.second.toString().padLeft(2, '0')}',
-                            style: TextStyle(color: Colors.black, fontSize: 20.0,),
+                            'Elapsed Time: ${new DateFormat("HH:mm:ss").format(_elapsedTime)}',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20.0,
+                            ),
                           )),
                     )),
                 Expanded(
@@ -202,7 +226,8 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                 Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 0.0, top: 0.0,  right: 16.0, bottom: 16.0),
+                    padding: const EdgeInsets.only(
+                        left: 0.0, top: 0.0, right: 16.0, bottom: 16.0),
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: FloatingActionButton(
@@ -214,7 +239,6 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                   ),
                 ),
               ]),
-
         ]));
   }
 }

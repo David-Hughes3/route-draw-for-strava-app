@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
 
+import 'package:strava_flutter/Models/fault.dart';
+
+import 'package:route_draw_for_strava/strava_wrapper.dart';
+
 class UploadActivityWidget extends StatefulWidget {
+  UploadActivityWidget(this._name, this._desc, this._gpxFilePath);
+  final String _name;
+  final String _desc;
+  final String _gpxFilePath;
+
   @override
-  _UploadActivityState createState() => _UploadActivityState();
+  _UploadActivityState createState() =>
+      _UploadActivityState(_name, _desc, _gpxFilePath);
 }
 
 class _UploadActivityState extends State<UploadActivityWidget> {
+  _UploadActivityState(this._name, this._desc, this._gpxFilePath);
+  final String _name;
+  final String _desc;
+  final String _gpxFilePath;
 
-  var _status = 'uploading';
+  String _status = 'Uploading...';
+
+  @override
+  void initState() {
+    super.initState();
+    StravaWrapper _strava = StravaWrapper();
+    _strava
+        .uploadActivity(_name, _desc, _gpxFilePath)
+        .then((Fault fault) => setState(() => _status += fault.message));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +44,20 @@ class _UploadActivityState extends State<UploadActivityWidget> {
         body: Stack(
           children: <Widget>[
             Center(
-              child: Text(
-                'Status: $_status',
-              ),
+              child: Text('Status: $_status',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 32.0,
+                    fontFamily: 'Roboto',
+                  )),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
-                  onPressed: () => Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName)),
+                  onPressed: () => Navigator.popUntil(
+                      context, ModalRoute.withName(Navigator.defaultRouteName)),
                   tooltip: 'BackToHome',
                   child: Icon(Icons.home),
                 ),

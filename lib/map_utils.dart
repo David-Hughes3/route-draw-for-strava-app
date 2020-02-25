@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -77,35 +78,88 @@ class MapUtils {
     return output;
   }
 
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+  static Future<File> toGPXFile(
+      List<LatLng> coords, DateTime start, DateTime elapsed) async {
+    //calc the total time
+    //datetime picker does not have a duration picker, so the date portion of the passed elapsed is useless/should be ignored
+    var endTime = start.add(new Duration(
+        hours: elapsed.hour, minutes: elapsed.minute, seconds: elapsed.second));
+    var totalTime = endTime.difference(start);
 
-    return directory.path;
+    //calculate distance per segment and total distance from passed LatLngs
+    List<double> distancePerSegment = [];
+    for (int i = 0; i < coords.length - 1; i++) {
+      distancePerSegment.add(_calcDistance(
+          coords[i].latitude,
+          coords[i].longitude,
+          coords[i + 1].latitude,
+          coords[i + 1].longitude));
+    }
+    double distanceSum = distancePerSegment.fold(
+        0, (p, c) => p + c); //sum as in a functional manner
+
+    //ratio of distance per segment times total time = time per segment
+    List<int> timePerSegment = [];
+    distancePerSegment.forEach((dist) =>
+        timePerSegment.add((dist / distanceSum * totalTime.inSeconds).round()));
+    timePerSegment.insert(0, 0);
+
+    //Start formatting gpx file
+    String name = 'Example';
+
+    String header =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"MapSource 6.15.5\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
+    name = "<name>" + name + "</name><trkseg>\n";
+
+    String segments = "";
+    DateFormat df = new DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    for (int i = 0; i < coords.length; i++) {
+      var newTime =
+          df.format(start.add(new Duration(seconds: timePerSegment[i])));
+      segments += "<trkpt lat=\"" + coords[i].latitude.toString() + "\" lon=\"" +  coords[i].longitude.toString() +  "\"><time>" +  newTime +  "</time></trkpt>\n";
+    }
+
+    String footer = "</trkseg></trk></gpx>";
+
+    //output gpx file
+    var gpx = GPXStorage();
+    return gpx
+        .writeRouteGPX(header + '\n' + name + '\n' + segments + '\n' + footer);
+  }
+}
+
+class GPXStorage {
+  final String _filename = 'route.gpx';
+
+  Future<String> get _getLocalFilePath async {
+    String dir = (await getApplicationDocumentsDirectory()).path;
+
+    return '$dir/$_filename';
   }
 
   Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/route.gpx');
+    final filePath = await _getLocalFilePath;
+    return File(filePath);
   }
 
-//  Future<File> toGPXFile(List<LatLng> coords) async {
-//    String name = 'Example';
-//
-//    String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"MapSource 6.15.5\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
-//    name = "<name>" + name + "</name><trkseg>\n";
-//
-//    String segments = "";
-//    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-//    for (Location location : points) {
-//      segments += "<trkpt lat=\"" + location.getLatitude() + "\" lon=\"" + location.getLongitude() + "\"><time>" + df.format(new Date(location.getTime())) + "</time></trkpt>\n";
-//    }
-//
-//    String footer = "</trkseg></trk></gpx>";
-//
-//
-//
-//    final file = await _localFile;
-//    // Write the file.
-//    return file.writeAsString('$counter');
-//  }
+  Future<String> readRouteGPX() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      String contents = await file.readAsString();
+
+      return contents;
+    } catch (e) {
+      print(e);
+      return e;
+    }
+  }
+
+  Future<File> writeRouteGPX(String outputString) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString(outputString);
+  }
 }
