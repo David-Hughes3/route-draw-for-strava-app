@@ -102,7 +102,13 @@ class MapUtils {
     List<int> timePerSegment = [];
     distancePerSegment.forEach((dist) =>
         timePerSegment.add((dist / distanceSum * totalTime.inSeconds).round()));
-    timePerSegment.insert(0, 0);
+
+    //cumulative discrete distribution needs to be used to add time to start
+    List<int> timePerSegmentCDF = [0];
+    timePerSegment.forEach((time) {
+      int cdfI = timePerSegmentCDF.last + time;
+      timePerSegmentCDF.add(cdfI);
+    });
 
     //Start formatting gpx file
     String name = 'Example';
@@ -115,8 +121,14 @@ class MapUtils {
     DateFormat df = new DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     for (int i = 0; i < coords.length; i++) {
       var newTime =
-          df.format(start.add(new Duration(seconds: timePerSegment[i])));
-      segments += "<trkpt lat=\"" + coords[i].latitude.toString() + "\" lon=\"" +  coords[i].longitude.toString() +  "\"><time>" +  newTime +  "</time></trkpt>\n";
+          df.format(start.add(new Duration(seconds: timePerSegmentCDF[i])));
+      segments += "<trkpt lat=\"" +
+          coords[i].latitude.toString() +
+          "\" lon=\"" +
+          coords[i].longitude.toString() +
+          "\"><time>" +
+          newTime +
+          "</time></trkpt>\n";
     }
 
     String footer = "</trkseg></trk></gpx>";

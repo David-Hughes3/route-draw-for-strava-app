@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:strava_flutter/Models/fault.dart';
 
 import 'package:route_draw_for_strava/strava_wrapper.dart';
+import 'package:route_draw_for_strava/map_utils.dart';
 
 class UploadActivityWidget extends StatefulWidget {
   UploadActivityWidget(this._name, this._desc, this._gpxFilePath);
@@ -26,6 +27,7 @@ class _UploadActivityState extends State<UploadActivityWidget> {
   @override
   void initState() {
     super.initState();
+    GPXStorage().readRouteGPX().then((String file) => print(file));
     StravaWrapper _strava = StravaWrapper();
     _strava
         .uploadActivity(_name, _desc, _gpxFilePath)
