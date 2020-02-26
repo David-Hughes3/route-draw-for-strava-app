@@ -88,7 +88,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           Expanded(
               flex: 1,
               child: Align(
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.topCenter,
                 child: _unitsSelectionWidgets(context),
               )),
           Expanded(
@@ -96,7 +96,14 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child:
-                    Image.asset("assets/api_logo_pwrdBy_strava_horiz_gray.png"),
+                    Image.asset("assets/mapbox-logo-black.png", height: MediaQuery.of(context).size.height * 0.05,),
+              )),
+          Expanded(
+              flex: 1,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child:
+                Image.asset("assets/api_logo_pwrdBy_strava_horiz_gray.png", height: MediaQuery.of(context).size.height * 0.1,),
               )),
 
         ],

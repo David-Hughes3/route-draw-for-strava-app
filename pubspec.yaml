@@ -56,6 +56,7 @@ flutter:
     - assets/blue_circle.png
     - assets/red_circle.png
     - assets/green_circle.png
+    - assets/mapbox-logo-black.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
