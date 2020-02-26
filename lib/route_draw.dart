@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_map_polyline/google_map_polyline.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong/latlong.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:route_draw_for_strava/activity_info.dart';
@@ -21,47 +22,36 @@ class RouteDrawWidget extends StatefulWidget {
 }
 
 enum _navType { WALK, LINE }
+enum _routePointType { BEGINNING, MIDDLE, END }
 
 class _RouteDrawWidgetState extends State<RouteDrawWidget> {
-  BitmapDescriptor _redCircle;
-  BitmapDescriptor _blueCircle;
-  BitmapDescriptor _greenCircle;
+  MapController _mapController;
+  double rotation = 0.0;
+
+  String _blueCirclePath = 'assets/blue_circle.png';
+  String _greenCirclePath = 'assets/green_circle.png';
+  String _redCirclePath = 'assets/red_circle.png';
+  double _markerWidth = 8.0;
+  double _markerHeight = 8.0;
 
   @override
   void initState() {
     super.initState();
+    _mapController = MapController();
   }
 
-  Future<BitmapDescriptor> _createMarkerImageFromAsset(
-      BuildContext context, String assetPath) async {
-    final ImageConfiguration imageConfiguration =
-        createLocalImageConfiguration(context, size: Size(12, 12));
-    return BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(96, 96)), assetPath);
-  }
-
-  final _startLatLng = const LatLng(45.521563, -122.677433);
-  GoogleMapController _mapController;
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
-  }
-
-  GoogleMapPolyline _googleMapPolyline =
-      new GoogleMapPolyline(apiKey: GOOGLE_MAPS_API_KEY);
-
-  MapType _currentMapType = MapType.normal;
-  var _distance = 0.0;
+  double _distance = 0.0;
   var _units = MapUtils.getUnitsAsString();
 
   var _curNavType = _navType.LINE;
   List<Marker> _markers = [];
   List<Polyline> _polylines = [];
 
-  Future _addMarker(LatLng latlang) async {
+  Future _addMarker(LatLng latlng) async {
     List<LatLng> coords = [];
     if (_markers.length >= 1) {
-      LatLng originPoint = _markers.last.position;
-      LatLng destPoint = latlang;
+      LatLng originPoint = _markers.last.point;
+      LatLng destPoint = latlng;
 
       if (_curNavType == _navType.LINE) {
         coords = [originPoint, destPoint];
@@ -80,37 +70,33 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       _markerHistory = [];
       _polylineHistory = [];
 
-      final MarkerId markerId = MarkerId("MARKER_ID_${_markers.length}");
-      Marker marker = Marker(
-        markerId: markerId,
-        draggable: false,
-        consumeTapEvents: true, //remove marker centering and nav buttons
-        position: latlang, //automatically obtain latitude and longitude
-        icon: _getMarkerIcon(),
-      );
-
-      _markers.add(marker);
+      if (_markers.length == 0)
+        _markers.add(_changeMarkerRoutePointType(
+            Marker(width: _markerWidth, height: _markerHeight, point: latlng),
+            _routePointType.BEGINNING));
+      else
+        _markers.add(_changeMarkerRoutePointType(
+            Marker(width: _markerWidth, height: _markerHeight, point: latlng),
+            _routePointType.END));
 
       if (_markers.length >= 2) {
+        _markers = List.generate(_markers.length, (i) {
+          if (i == 0 || i == _markers.length - 1) {
+            return _markers[i];
+          } else
+            return _changeMarkerRoutePointType(
+                _markers[i], _routePointType.MIDDLE);
+        });
+
         _polylines.add(Polyline(
-          polylineId: PolylineId("POLYLINE_ID_${_polylines.length}"),
-          visible: true,
           points: coords,
           color: Colors.blue,
-          width: 4,
+          strokeWidth: 2.0,
         ));
       }
 
       _distance = _calcDistance();
     });
-  }
-
-  BitmapDescriptor _getMarkerIcon() {
-    //print(_greenCircle.toString() + _blueCircle.toString());
-    if (_markers.length == 0) {
-      return _greenCircle;
-    }
-    return _blueCircle;
   }
 
   void _clearButtonCallback() {
@@ -140,6 +126,10 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       var lastMarker = _markers.removeLast();
       _markerHistory.add(lastMarker);
 
+      if (_markers.length >= 2)
+        _markers.last =
+            _changeMarkerRoutePointType(_markers.last, _routePointType.END);
+
       if (_polylines.isNotEmpty) {
         var lastPolyline = _polylines.removeLast();
         _polylineHistory.add(lastPolyline);
@@ -154,8 +144,18 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       return;
     }
     setState(() {
+      if (_markers.length >= 2)
+        _markers.last =
+            _changeMarkerRoutePointType(_markers.last, _routePointType.MIDDLE);
+
       var lastMarker = _markerHistory.removeLast();
-      _markers.add(lastMarker);
+
+      if (_markers.length == 0)
+        _markers.add(
+            _changeMarkerRoutePointType(lastMarker, _routePointType.BEGINNING));
+      else
+        _markers
+            .add(_changeMarkerRoutePointType(lastMarker, _routePointType.END));
 
       if (_polylineHistory.isNotEmpty && _markers.length >= 2) {
         var lastPolyline = _polylineHistory.removeLast();
@@ -166,6 +166,23 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     });
   }
 
+  Marker _changeMarkerRoutePointType(Marker inMarker, _routePointType type) {
+    String circlePath;
+    if (type == _routePointType.BEGINNING)
+      circlePath = _greenCirclePath;
+    else if (type == _routePointType.MIDDLE)
+      circlePath = _blueCirclePath;
+    else if (type == _routePointType.END) circlePath = _redCirclePath;
+
+    return Marker(
+        width: inMarker.width,
+        height: inMarker.height,
+        point: inMarker.point,
+        builder: (ctx) => Container(
+              child: Image(image: AssetImage(circlePath)),
+            ));
+  }
+
   void _onLocationSearchingButtonPressed() async {
 //    GeolocationStatus geolocationStatus  = await Geolocator().checkGeolocationPermissionStatus();
 //    print(geolocationStatus);
@@ -173,10 +190,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     print(position);
 
-    _mapController.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(
-          target: LatLng(position.latitude, position.longitude), zoom: 15.0),
-    ));
+    _mapController.move(LatLng(position.latitude, position.longitude), 15);
   }
 
   double _calcDistance() {
@@ -195,12 +209,6 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _createMarkerImageFromAsset(context, 'assets/red_circle.png')
-        .then((output) => setState(() => _redCircle = output));
-    _createMarkerImageFromAsset(context, 'assets/blue_circle.png')
-        .then((output) => setState(() => _blueCircle = output));
-    _createMarkerImageFromAsset(context, 'assets/green_circle.png')
-        .then((output) => setState(() => _greenCircle = output));
     return Scaffold(
         appBar: AppBar(
           title: Text("Route Draw"),
@@ -212,18 +220,25 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
           ],
         ),
         body: Stack(children: <Widget>[
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _startLatLng,
-              zoom: 11.0,
+          new FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              center: LatLng(51.5, -0.09),
+              zoom: 13.0,
+              onTap: _addMarker,
             ),
-            mapType: _currentMapType,
-            polylines: _polylines.toSet(),
-            markers: _markers.toSet(),
-            onTap: (latlang) {
-              _addMarker(latlang);
-            },
+            layers: [
+              TileLayerOptions(
+                urlTemplate: "https://api.tiles.mapbox.com/v4/"
+                    "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
+                additionalOptions: {
+                  'accessToken': MAPBOX_API_KEY,
+                  'id': 'mapbox.streets',
+                },
+              ),
+              MarkerLayerOptions(markers: _markers),
+              PolylineLayerOptions(polylines: _polylines),
+            ],
           ),
           _navSelectionWidgets(context),
           _distanceDisplayWidget(context),
@@ -362,9 +377,8 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
               child: RaisedButton(
                 elevation: 0.0,
                 onPressed: () {
-                  _mapController.moveCamera(
-                    CameraUpdate.zoomIn(),
-                  );
+                  _mapController.move(
+                      _mapController.center, _mapController.zoom + 1);
                 },
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
@@ -383,9 +397,8 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
               child: RaisedButton(
                 elevation: 0.0,
                 onPressed: () {
-                  _mapController.moveCamera(
-                    CameraUpdate.zoomOut(),
-                  );
+                  _mapController.move(
+                      _mapController.center, _mapController.zoom - 1);
                 },
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
@@ -402,28 +415,6 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
           ])),
     );
   }
-
-  void _onMapTypeButtonPressed() {
-    setState(() {
-      _currentMapType = _currentMapType == MapType.normal
-          ? MapType.satellite
-          : MapType.normal;
-    });
-  }
-
-//          Padding(
-//            padding: const EdgeInsets.all(16.0),
-//            child: Align(
-//              alignment: Alignment.topRight,
-//              child: FloatingActionButton(
-//                heroTag: "btn1",
-//                onPressed: _onMapTypeButtonPressed,
-//                materialTapTargetSize: MaterialTapTargetSize.padded,
-//                backgroundColor: Colors.deepOrange,
-//                child: const Icon(Icons.map, size: 36.0),
-//              ),
-//            ),
-//          ),
 
   Widget _undoWidgets(BuildContext context) {
     return Padding(

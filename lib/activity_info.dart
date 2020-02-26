@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong/latlong.dart';
 import 'package:intl/intl.dart';
 
 import 'package:route_draw_for_strava/upload_activity.dart';

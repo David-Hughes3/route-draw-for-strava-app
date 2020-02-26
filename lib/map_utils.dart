@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
-
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 enum Units { KM, MI }
 
@@ -64,6 +64,7 @@ class MapUtils {
     return km * 0.621371;
   }
 
+  // TODO
   static List<LatLng> polylinesToLatLngs(List<Polyline> input) {
     List<LatLng> output = [];
     if (input.length != 0) {
