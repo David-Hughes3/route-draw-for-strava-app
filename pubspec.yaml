@@ -52,6 +52,10 @@ flutter:
     - assets/api_logo_pwrdBy_strava_horiz_gray.png
     - assets/api_logo_pwrdBy_strava_horiz_light.png
     - assets/btn_strava_connectwith_orange@2x.png
+    - assets/blue_circle.png
+    - assets/red_circle.png
+    - assets/green_circle.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

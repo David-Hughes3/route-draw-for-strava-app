@@ -10,6 +10,8 @@ import 'package:route_draw_for_strava/activity_info.dart';
 import 'package:route_draw_for_strava/secret.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
 
+import 'dart:ui' as ui;
+
 //reference to adding pin on press: https://stackoverflow.com/questions/57159415/how-does-drop-pins-with-long-press-on-google-map-with-flutter
 //reference to adding marker and polyline: https://stackoverflow.com/questions/53171531/how-to-add-polyline-on-google-maps-flutter-plugin
 
@@ -21,6 +23,23 @@ class RouteDrawWidget extends StatefulWidget {
 enum _navType { WALK, LINE }
 
 class _RouteDrawWidgetState extends State<RouteDrawWidget> {
+  BitmapDescriptor _redCircle;
+  BitmapDescriptor _blueCircle;
+  BitmapDescriptor _greenCircle;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<BitmapDescriptor> _createMarkerImageFromAsset(
+      BuildContext context, String assetPath) async {
+    final ImageConfiguration imageConfiguration =
+        createLocalImageConfiguration(context, size: Size(12, 12));
+    return BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(96, 96)), assetPath);
+  }
+
   final _startLatLng = const LatLng(45.521563, -122.677433);
   GoogleMapController _mapController;
   void _onMapCreated(GoogleMapController controller) {
@@ -64,9 +83,10 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
       final MarkerId markerId = MarkerId("MARKER_ID_${_markers.length}");
       Marker marker = Marker(
         markerId: markerId,
-        draggable: true,
+        draggable: false,
+        consumeTapEvents: true, //remove marker centering and nav buttons
         position: latlang, //automatically obtain latitude and longitude
-        icon: BitmapDescriptor.defaultMarker,
+        icon: _getMarkerIcon(),
       );
 
       _markers.add(marker);
@@ -83,6 +103,14 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
 
       _distance = _calcDistance();
     });
+  }
+
+  BitmapDescriptor _getMarkerIcon() {
+    //print(_greenCircle.toString() + _blueCircle.toString());
+    if (_markers.length == 0) {
+      return _greenCircle;
+    }
+    return _blueCircle;
   }
 
   void _clearButtonCallback() {
@@ -167,6 +195,12 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _createMarkerImageFromAsset(context, 'assets/red_circle.png')
+        .then((output) => setState(() => _redCircle = output));
+    _createMarkerImageFromAsset(context, 'assets/blue_circle.png')
+        .then((output) => setState(() => _blueCircle = output));
+    _createMarkerImageFromAsset(context, 'assets/green_circle.png')
+        .then((output) => setState(() => _greenCircle = output));
     return Scaffold(
         appBar: AppBar(
           title: Text("Route Draw"),
