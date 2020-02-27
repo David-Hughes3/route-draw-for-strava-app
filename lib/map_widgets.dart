@@ -14,52 +14,73 @@ enum _navType { WALK, LINE }
 enum _routePointType { BEGINNING, MIDDLE, END }
 
 class MapArguments {
-  String middlePoint = 'assets/blue_circle.png';
-  String beginningPoint = 'assets/green_circle.png';
-  String endPoint = 'assets/red_circle.png';
+  LatLng initialCenter = LatLng(34.056234, -117.82057);
+  double initialZoom = 15.0;
+  double distanceInKm = 0.0; //always stored as KM
+  List<Marker> markers = [];
+  List<Polyline> polylines = [];
   double markerWidth = 8.0;
   double markerHeight = 8.0;
+  String beginningMarkerPath = 'assets/green_circle.png';
+  String middleMarkerPath = 'assets/blue_circle.png';
+  String endMarkerPath = 'assets/red_circle.png';
 }
 
 class MapWidgets extends StatefulWidget {
   final ValueChanged<List<Polyline>> onPolylinesChanged;
+  MapArguments mapArgs;
 
-  MapWidgets({this.onPolylinesChanged});
+  MapWidgets(this.mapArgs, {this.onPolylinesChanged});
 
   @override
-  _MapWidgetsState createState() => _MapWidgetsState();
+  _MapWidgetsState createState() => _MapWidgetsState(mapArgs);
 }
 
 class _MapWidgetsState extends State<MapWidgets> {
-  MapController _mapController;
+  _MapWidgetsState(this.args);
+  MapArguments args;
+
+  ///vars initialized by MapArguments
+  LatLng _initialCenter;
+  double _initialZoom;
   double _distance;
-  String _units;
   List<Marker> _markers;
   List<Polyline> _polylines;
-  _navType _curNavType;
   double _markerWidth;
   double _markerHeight;
   String _beginningMarkerPath;
   String _middleMarkerPath;
   String _endMarkerPath;
 
+  ///Variables always defaulted to empty
   List<Marker> _markerHistory = [];
   List<Polyline> _polylineHistory = [];
+
+  ///Variables setup by init state
+  MapController _mapController;
+  String _units;
+  _navType _curNavType;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-    _distance = 0.0;
     _units = MapUtils.getUnitsAsString();
-    _markers = [];
-    _polylines = [];
     _curNavType = _navType.LINE;
-    _markerWidth = 8.0;
-    _markerHeight = 8.0;
-    _beginningMarkerPath = 'assets/green_circle.png';
-    _middleMarkerPath = 'assets/blue_circle.png';
-    _endMarkerPath = 'assets/red_circle.png';
+
+    _initialCenter = args.initialCenter;
+    _initialZoom = args.initialZoom;
+    if (MapUtils.getUnits() == Units.MI)
+      _distance = MapUtils.kilometersToMiles(args.distanceInKm);
+    else
+      _distance = args.distanceInKm;
+    _markers = args.markers;
+    _polylines = args.polylines;
+    _markerWidth = args.markerWidth;
+    _markerHeight = args.markerHeight;
+    _beginningMarkerPath = args.beginningMarkerPath;
+    _middleMarkerPath = args.middleMarkerPath;
+    _endMarkerPath = args.endMarkerPath;
   }
 
   @override
@@ -68,8 +89,8 @@ class _MapWidgetsState extends State<MapWidgets> {
       FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          center: LatLng(51.5, -0.09),
-          zoom: 13.0,
+          center: _initialCenter,
+          zoom: _initialZoom,
           onTap: _addMarker,
         ),
         layers: [

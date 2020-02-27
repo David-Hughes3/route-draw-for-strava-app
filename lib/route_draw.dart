@@ -41,7 +41,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
           ],
         ),
         body: Stack(children: <Widget>[
-          MapWidgets(onPolylinesChanged: (newPolylines) {
+          MapWidgets(MapArguments(), onPolylinesChanged: (newPolylines) {
             _polylines = newPolylines;
           }),
           _completeDrawWidget(context),

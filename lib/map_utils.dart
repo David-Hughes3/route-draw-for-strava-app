@@ -61,7 +61,11 @@ class MapUtils {
   }
 
   static double kilometersToMiles(double km) {
-    return km * 0.621371;
+    return km * 0.62137119;
+  }
+
+  static double milesToKilometers(double mi) {
+    return mi * 1.609344;
   }
 
   // TODO
