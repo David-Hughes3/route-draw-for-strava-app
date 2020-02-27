@@ -15,8 +15,6 @@ import 'package:strava_flutter/API/Oauth.dart';
 
 import 'package:strava_flutter/globals.dart';
 
-import 'new_strava_flutter_upload.dart';
-
 class AccessAuth extends Auth {}
 
 class StravaWrapper {
@@ -104,9 +102,7 @@ class StravaWrapper {
           error.statusAuthError, 'Authentication has not been succesful');
     }
 
-    var newStrava = NewStravaFlutterUpload();
-
-    Fault fault = await newStrava.uploadActivity(name, desc, filepath, 'gpx');
+    Fault fault = await _strava.uploadActivity(name, desc, filepath, 'gpx');
 
     return fault;
   }

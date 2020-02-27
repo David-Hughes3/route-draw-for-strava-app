@@ -24,7 +24,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
-  strava_flutter: ^1.2.0+45
+  strava_flutter: ^1.2.0+46
   geolocator: ^5.2.1
   flutter_datetime_picker: ^1.3.4
   path_provider: ^1.6.1
