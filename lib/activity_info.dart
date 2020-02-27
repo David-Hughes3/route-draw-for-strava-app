@@ -70,175 +70,159 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("Route Draw for Strava"),
         ),
-        body: Stack(children: <Widget>[
-          Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                    flex: 1,
-                    child: Align(
-                        alignment: Alignment.center,
-                        child: Text('Enter Activity Info',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 32.0,
-                              fontFamily: 'Roboto',
-                            )))),
-                Expanded(
-                    flex: 1,
-                    child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Text('Activity Title',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24.0,
-                              fontFamily: 'Roboto',
-                            )))),
-                Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Center(
-                        child: TextField(
-                          controller: _controllerTitle,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Activity Title',
-                          ),
-                        ),
-                      )),
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Center(
-                            child: Text(
-                                'Distance: ${_distance.toStringAsFixed(2)} $_units ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24.0,
-                                  fontFamily: 'Roboto',
-                                )),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Center(
-                            child: RaisedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Edit'),
-                            ),
-                          ),
-                        )
-                      ],
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: RaisedButton(
-                          onPressed: () {
-                            DatePicker.showDateTimePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime.now().add(new Duration(
-                                    days:
-                                        -1825)), //minimum time to scroll to is 5 years ago
-                                maxTime: DateTime.now()
-                                    .add(new Duration(seconds: 1)),
-                                onConfirm: (date) {
-                              print('confirm $date');
-                              setState(() {
-                                _startDateTime = date;
-                              });
-                            },
-                                currentTime: _startDateTime,
-                                locale: LocaleType.en);
-                          },
-                          child: Text(
-                            'Start date-time: ${new DateFormat("MM/dd/yy h:mm a").format(_startDateTime)}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20.0,
-                            ),
+        body: ListView(padding: EdgeInsets.all(15.0), children: <Widget>[
+          Center(
+            child: Text('Enter Activity Info',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32.0,
+                  fontFamily: 'Roboto',
+                )),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Text('Activity Title',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24.0,
+                fontFamily: 'Roboto',
+              )),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Center(
+            child: TextField(
+              controller: _controllerTitle,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Activity Title',
+              ),
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child:
+                      Text('Distance: ${_distance.toStringAsFixed(2)} $_units ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24.0,
+                            fontFamily: 'Roboto',
                           )),
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: RaisedButton(
-                          onPressed: () {
-                            DatePicker.showTimePicker(
-                              context,
-                              showTitleActions: true,
-                              onConfirm: (date) {
-                                print('confirm $date');
-                                setState(() {
-                                  _elapsedTime = date;
-                                });
-                              },
-                              currentTime: _elapsedTime,
-                            );
-                          },
-                          child: Text(
-                            'Elapsed Time: ${new DateFormat("HH:mm:ss").format(_elapsedTime)}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20.0,
-                            ),
-                          )),
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Text('Description',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24.0,
-                              fontFamily: 'Roboto',
-                            )))),
-                Expanded(
-                  flex: 1,
-                  child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Center(
-                        child: TextField(
-                          controller: _controllerDesc,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Optional',
-                          ),
-                        ),
-                      )),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 0.0, top: 0.0, right: 16.0, bottom: 16.0),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
-                        onPressed: () => _toUploadActivity(context),
-                        tooltip: 'UploadActivity',
-                        child: Icon(Icons.check),
-                      ),
-                    ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: RaisedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Edit'),
                   ),
                 ),
-              ]),
+              )
+            ],
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          RaisedButton(
+              onPressed: () {
+                DatePicker.showDateTimePicker(context,
+                    showTitleActions: true,
+                    minTime: DateTime.now().add(new Duration(
+                        days:
+                            -1825)), //minimum time to scroll to is 5 years ago
+                    maxTime: DateTime.now().add(new Duration(seconds: 1)),
+                    onConfirm: (date) {
+                  print('start date-time $date');
+                  setState(() {
+                    _startDateTime = date;
+                  });
+                }, currentTime: _startDateTime, locale: LocaleType.en);
+              },
+              child: Text(
+                'Start date-time: ${new DateFormat("MM/dd/yy h:mm a").format(_startDateTime)}',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                ),
+              )),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.025,
+          ),
+          RaisedButton(
+              onPressed: () {
+                DatePicker.showTimePicker(
+                  context,
+                  showTitleActions: true,
+                  onConfirm: (date) {
+                    print('elapsed-time $date');
+                    setState(() {
+                      _elapsedTime = date;
+                    });
+                  },
+                  currentTime: _elapsedTime,
+                );
+              },
+              child: Text(
+                'Elapsed Time: ${new DateFormat("HH:mm:ss").format(_elapsedTime)}',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                ),
+              )),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Text('Description',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24.0,
+                fontFamily: 'Roboto',
+              )),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Center(
+            child: TextField(
+              controller: _controllerDesc,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Optional',
+              ),
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 0.0, top: 0.0, right: 16.0, bottom: 16.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                onPressed: () => _toUploadActivity(context),
+                tooltip: 'UploadActivity',
+                child: Icon(Icons.check),
+              ),
+            ),
+          ),
         ]));
   }
 }
