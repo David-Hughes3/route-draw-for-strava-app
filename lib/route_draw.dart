@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -28,12 +31,24 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     );
   }
 
+  void _saveRoute() {
+    var temp = RouteStorage("test.json", _polylines);
+    temp.writeRouteJSON().then((file) {
+      print(file.readAsStringSync());
+      RouteStorage.readRouteFromFilepath(file.path).then((args)=>print(args.distanceInKm.toString() + " " + MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(args.polylines)).toString()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text("Route Draw"),
           actions: <Widget>[
+            IconButton(
+                icon: const Icon(Icons.save),
+                tooltip: 'Save Route',
+                onPressed: _saveRoute),
             IconButton(
                 icon: const Icon(Icons.check),
                 tooltip: 'Next page',

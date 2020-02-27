@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
+
+import 'map_widgets.dart';
 
 enum Units { KM, MI }
 
@@ -68,18 +71,28 @@ class MapUtils {
     return mi * 1.609344;
   }
 
-  // TODO
   static List<LatLng> polylinesToLatLngs(List<Polyline> input) {
     List<LatLng> output = [];
     if (input.length != 0) {
       output = [input[0].points[0]];
-      input.forEach((p) => {
-            p.points.forEach((coord) => {
-                  if (coord != output.last) {output.add(coord)}
-                })
-          });
+      input.forEach((p) {
+        p.points.forEach((coord) {
+          if (coord != output.last) output.add(coord);
+        });
+      });
     }
+    return output;
+  }
 
+  static List<LatLng> polylinesToMarkerPoints(List<Polyline> input) {
+    List<LatLng> output = [];
+
+    if (input.length != 0) {
+      LatLng firstPoint = input[0].points.first;
+      output.add(firstPoint);
+
+      input.forEach((poly) => output.add(poly.points.last));
+    }
     return output;
   }
 
@@ -180,5 +193,93 @@ class GPXStorage {
 
     // Write the file
     return file.writeAsString(outputString);
+  }
+}
+
+class RouteStorage {
+  String _filename;
+  List<Polyline> _polylines;
+  double _distance;
+  LatLng _initialCenter;
+
+  RouteStorage(filename, polylines) {
+    _filename = filename;
+    _polylines = polylines;
+
+    _distance =
+        MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
+    _initialCenter = _polylines[0].points[0];
+  }
+
+  Future<String> get _getLocalFilePath async {
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    return '$dir/saved_routes/$_filename';
+  }
+
+  Future<File> get _localFile async {
+    final filePath = await _getLocalFilePath;
+    return File(filePath);
+  }
+
+  Future<MapArguments> readRouteJSON() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      String contents = await file.readAsString();
+      Map<String, dynamic> temp = jsonDecode(contents);
+
+      MapArguments args = MapArguments();
+      args.polylines = temp['polylines'];
+      args.distanceInKm = temp['distance'];
+      args.initialCenter = temp['initialCenter'];
+
+      return args;
+    } catch (e) {
+      print(e);
+      return e;
+    }
+  }
+
+  static Future<MapArguments> readRouteFromFilepath(String path) async {
+    try {
+      final file = File(path);
+
+      // Read the file
+      String contents = await file.readAsString();
+      Map<String, dynamic> temp = jsonDecode(contents);
+
+      MapArguments args = MapArguments();
+      args.polylines = temp['polylines'];
+      args.distanceInKm = temp['distance'];
+      args.initialCenter = temp['initialCenter'];
+
+      return args;
+    } catch (e) {
+      print(e);
+      return e;
+    }
+  }
+
+  RouteStorage.fromJson(Map<String, dynamic> json)
+      : _filename = json['filename'] as String,
+        _distance = json['distance'] as double,
+        _initialCenter = json['initialCenter'] as LatLng,
+        _polylines = json['polylines'] as List<Polyline>;
+
+  Map<String, dynamic> toJson() => {
+        'filename': this._filename,
+        'distance': this._distance,
+        'initialCenter': this._initialCenter,
+        'polylines': this._polylines,
+      };
+
+  Future<File> writeRouteJSON() async {
+    final file = await _localFile;
+
+    String jsonString = jsonEncode(this.toJson());
+
+    // Write the file
+    return file.writeAsString(jsonString);
   }
 }

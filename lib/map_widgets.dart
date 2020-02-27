@@ -24,6 +24,8 @@ class MapArguments {
   String beginningMarkerPath = 'assets/green_circle.png';
   String middleMarkerPath = 'assets/blue_circle.png';
   String endMarkerPath = 'assets/red_circle.png';
+  Color polylineColor =  Colors.blue;
+  double polylineStrokeWidth = 2.0;
 }
 
 class MapWidgets extends StatefulWidget {
@@ -51,6 +53,8 @@ class _MapWidgetsState extends State<MapWidgets> {
   String _beginningMarkerPath;
   String _middleMarkerPath;
   String _endMarkerPath;
+  Color _polylineColor;
+  double _polylineStrokeWidth;
 
   ///Variables always defaulted to empty
   List<Marker> _markerHistory = [];
@@ -81,6 +85,8 @@ class _MapWidgetsState extends State<MapWidgets> {
     _beginningMarkerPath = args.beginningMarkerPath;
     _middleMarkerPath = args.middleMarkerPath;
     _endMarkerPath = args.endMarkerPath;
+    _polylineColor =  args.polylineColor;
+    _polylineStrokeWidth = args.polylineStrokeWidth;
   }
 
   @override
@@ -159,8 +165,8 @@ class _MapWidgetsState extends State<MapWidgets> {
 
         _polylines.add(Polyline(
           points: coords,
-          color: Colors.blue,
-          strokeWidth: 2.0,
+          color: _polylineColor,
+          strokeWidth: _polylineStrokeWidth,
         ));
         widget.onPolylinesChanged(_polylines);
       }
