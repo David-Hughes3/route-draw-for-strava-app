@@ -83,9 +83,11 @@ class MapUtils {
       List<LatLng> coords, DateTime start, DateTime elapsed) async {
     //calc the total time
     //datetime picker does not have a duration picker, so the date portion of the passed elapsed is useless/should be ignored
-    var endTime = start.add(new Duration(
-        hours: elapsed.hour, minutes: elapsed.minute, seconds: elapsed.second));
-    var totalTime = endTime.difference(start);
+    int totalTime = Duration(
+            hours: elapsed.hour,
+            minutes: elapsed.minute,
+            seconds: elapsed.second)
+        .inSeconds;
 
     //calculate distance per segment and total distance from passed LatLngs
     List<double> distancePerSegment = [];
@@ -101,8 +103,8 @@ class MapUtils {
 
     //ratio of distance per segment times total time = time per segment
     List<int> timePerSegment = [];
-    distancePerSegment.forEach((dist) =>
-        timePerSegment.add((dist / distanceSum * totalTime.inSeconds).round()));
+    distancePerSegment.forEach(
+        (dist) => timePerSegment.add((dist / distanceSum * totalTime).round()));
 
     //cumulative discrete distribution needs to be used to add time to start
     List<int> timePerSegmentCDF = [0];

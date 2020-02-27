@@ -12,7 +12,7 @@ class RouteDrawWidget extends StatefulWidget {
 }
 
 class _RouteDrawWidgetState extends State<RouteDrawWidget> {
-  List<Polyline> _polylines;
+  List<Polyline> _polylines = [];
 
   @override
   void initState() {

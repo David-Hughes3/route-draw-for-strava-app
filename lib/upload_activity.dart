@@ -31,7 +31,7 @@ class _UploadActivityState extends State<UploadActivityWidget> {
     StravaWrapper _strava = StravaWrapper();
     _strava
         .uploadActivity(_name, _desc, _gpxFilePath)
-        .then((Fault fault) => setState(() => _status += fault.message));
+        .then((Fault fault) => setState(() => _status = fault.message));
   }
 
   @override
