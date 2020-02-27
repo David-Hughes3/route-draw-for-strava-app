@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
@@ -209,77 +211,150 @@ class RouteStorage {
     _distance =
         MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
     _initialCenter = _polylines[0].points[0];
+
+
   }
 
   Future<String> get _getLocalFilePath async {
     String dir = (await getApplicationDocumentsDirectory()).path;
-    return '$dir/saved_routes/$_filename';
+
+    var folder = Directory('${dir}/saved_routes/');
+
+    if(await folder.exists()){ //if folder already exists return path
+      return folder.path;
+    }else{//if folder not exists create folder and then return its path
+      var newFolder = await folder.create(recursive: true);
+      return newFolder.path;
+    }
+
   }
 
   Future<File> get _localFile async {
     final filePath = await _getLocalFilePath;
-    return File(filePath);
+    return File(filePath + _filename);
   }
 
-  Future<MapArguments> readRouteJSON() async {
-    try {
-      final file = await _localFile;
-
-      // Read the file
-      String contents = await file.readAsString();
-      Map<String, dynamic> temp = jsonDecode(contents);
-
-      MapArguments args = MapArguments();
-      args.polylines = temp['polylines'];
-      args.distanceInKm = temp['distance'];
-      args.initialCenter = temp['initialCenter'];
-
-      return args;
-    } catch (e) {
-      print(e);
-      return e;
-    }
-  }
-
-  static Future<MapArguments> readRouteFromFilepath(String path) async {
+  static Future<MapArguments> readRouteFromFilepath(
+      String path, MapArguments mapArgs) async {
     try {
       final file = File(path);
 
       // Read the file
       String contents = await file.readAsString();
-      Map<String, dynamic> temp = jsonDecode(contents);
 
-      MapArguments args = MapArguments();
-      args.polylines = temp['polylines'];
-      args.distanceInKm = temp['distance'];
-      args.initialCenter = temp['initialCenter'];
+      Map json = jsonDecode(contents);
 
-      return args;
+      List<List<double>> temp3 = [];
+      json['polylinesLats'].forEach((x) => temp3.add(x.cast<double>().toList()) );
+
+      String _name = json['name'] as String;
+      double _distance = json['distance'] as double;
+      double _initialCenterLat = json['initialCenterLat'] as double;
+      double _initialCenterLng = json['initialCenterLng'] as double;
+      List<List<double>> _polylineLats = [];
+      json['polylinesLats'].forEach((x) => _polylineLats.add(x.cast<double>().toList()) );
+      List<List<double>> _polylineLngs = [];
+      json['polylinesLngs'].forEach((x) => _polylineLngs.add(x.cast<double>().toList()) );
+
+      LatLng center = LatLng(_initialCenterLat, _initialCenterLng);
+      List<Polyline> polylines = [];
+      for (int i = 0; i < _polylineLats.length; i++) {
+        var lats = _polylineLats[i];
+        var lngs = _polylineLngs[i];
+        List<LatLng> coords = [];
+        for (int i = 0; i < lats.length; i++) {
+          coords.add(LatLng(lats[i], lngs[i]));
+        }
+
+        Polyline newPolyline = Polyline(
+          points: coords,
+          color: mapArgs.polylineColor,
+          strokeWidth: mapArgs.polylineStrokeWidth,
+        );
+        polylines.add(newPolyline);
+      }
+
+      var markerPoints = MapUtils.polylinesToMarkerPoints(polylines);
+      List<Marker> markers = [];
+      markerPoints.asMap().forEach((i, point) {
+        String imgPath = mapArgs.middleMarkerPath;
+        if (i == 0) imgPath = mapArgs.beginningMarkerPath;
+        if (i == markerPoints.length - 1) imgPath = mapArgs.endMarkerPath;
+
+        Marker newMarker = Marker(
+            width: mapArgs.markerWidth,
+            height: mapArgs.markerHeight,
+            point: point,
+            builder: (ctx) => Container(
+                  child: Image(image: AssetImage(imgPath)),
+                ));
+        markers.add(newMarker);
+      });
+
+      mapArgs.initialCenter = center;
+      mapArgs.polylines = polylines;
+      mapArgs.markers = markers;
+      mapArgs.distanceInKm = _distance;
+
+      return mapArgs;
     } catch (e) {
       print(e);
       return e;
     }
   }
 
-  RouteStorage.fromJson(Map<String, dynamic> json)
-      : _filename = json['filename'] as String,
-        _distance = json['distance'] as double,
-        _initialCenter = json['initialCenter'] as LatLng,
-        _polylines = json['polylines'] as List<Polyline>;
-
-  Map<String, dynamic> toJson() => {
-        'filename': this._filename,
-        'distance': this._distance,
-        'initialCenter': this._initialCenter,
-        'polylines': this._polylines,
-      };
-
   Future<File> writeRouteJSON() async {
     final file = await _localFile;
 
-    String jsonString = jsonEncode(this.toJson());
+    List<List<double>> polylineLats = [];
+    List<List<double>> polylineLngs = [];
+
+    _polylines.forEach((poly) {
+      List<double> lats = [];
+      List<double> lngs = [];
+      poly.points.forEach((latlng) {
+        lats.add(latlng.latitude);
+        lngs.add(latlng.longitude);
+      });
+      polylineLats.add(lats);
+      polylineLngs.add(lngs);
+    });
+
+    var toEncode = _routeJSON(_filename, _distance, _initialCenter.latitude,
+        _initialCenter.longitude, polylineLats, polylineLngs);
+
+    String jsonString = jsonEncode(toEncode);
 
     // Write the file
     return file.writeAsString(jsonString);
   }
+}
+
+class _routeJSON {
+  final String _name;
+  final double _distance;
+  final double _initialCenterLat;
+  final double _initialCenterLng;
+  final List<List<double>> _polylineLats;
+  final List<List<double>> _polylineLngs;
+
+  _routeJSON(this._name, this._distance, this._initialCenterLat,
+      this._initialCenterLng, this._polylineLats, this._polylineLngs);
+
+//  _routeJSON.fromJson(Map<String, dynamic> json)
+//      : _name = json['name'] as String,
+//        _distance = json['distance'] as double,
+//        _initialCenterLat = json['initialCenterLat'] as double,
+//        _initialCenterLng = json['initialCenterLng'] as double,
+//        _polylineLats = json['polylinesLats'].map((x) => x.cast<double>()).toList() as List<List<double>>,
+//        _polylineLngs = json['polylinesLngs'].map((x) => x.cast<double>()).toList() as List<List<double>>;
+
+  Map<String, dynamic> toJson() => {
+        'name': this._name,
+        'distance': this._distance,
+        'initialCenterLat': this._initialCenterLat,
+        'initialCenterLng': this._initialCenterLng,
+        'polylinesLats': this._polylineLats,
+        'polylinesLngs': this._polylineLngs,
+      };
 }

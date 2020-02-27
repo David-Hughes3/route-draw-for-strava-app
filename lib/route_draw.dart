@@ -35,7 +35,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
     var temp = RouteStorage("test.json", _polylines);
     temp.writeRouteJSON().then((file) {
       print(file.readAsStringSync());
-      RouteStorage.readRouteFromFilepath(file.path).then((args)=>print(args.distanceInKm.toString() + " " + MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(args.polylines)).toString()));
+      //RouteStorage.readRouteFromFilepath(file.path, MapArguments()).then((args)=>print(args.distanceInKm.toString() + " " + MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(args.polylines)).toString()));
     });
   }
 
