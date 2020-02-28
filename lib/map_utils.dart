@@ -202,18 +202,26 @@ class GPXStorage {
 }
 
 class RouteStorage {
+  String _routeName;
   String _filename;
   List<Polyline> _polylines;
   double _distance;
   LatLng _initialCenter;
+  String _startAddress;
+  String _endAddress;
 
-  RouteStorage(filename, polylines) {
-    _filename = filename;
+  RouteStorage(routeName, polylines) {
+    _routeName = routeName;
+    _filename = routeName + ".json";
     _polylines = polylines;
 
     _distance =
         MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
     _initialCenter = _polylines[0].points[0];
+
+    ///TODO add latlngTolocation utility
+    _startAddress = "Default, Loc";
+    _endAddress = "Default, EndLoc";
   }
 
   static Future<String> get _getLocalDirPath async {
@@ -236,8 +244,8 @@ class RouteStorage {
     return File(filePath + _filename);
   }
 
-  static Future<MapArguments> readRouteFromFilepath(
-      String path, MapArguments mapArgs) async {
+  static Future<SavedMapArguments> readRouteFromFilepath(
+      String path, SavedMapArguments mapArgs) async {
     try {
       final file = File(path);
 
@@ -250,7 +258,9 @@ class RouteStorage {
       json['polylinesLats']
           .forEach((x) => temp3.add(x.cast<double>().toList()));
 
-      String _name = json['name'] as String;
+      String _routeName = json['routeName'] as String;
+      String _startAddress = json['startAddress'] as String;
+      String _endAddress = json['endAddress'] as String;
       double _distance = json['distance'] as double;
       double _initialCenterLat = json['initialCenterLat'] as double;
       double _initialCenterLng = json['initialCenterLng'] as double;
@@ -296,6 +306,10 @@ class RouteStorage {
         markers.add(newMarker);
       });
 
+      mapArgs.routeName = _routeName;
+      mapArgs.startAddress = _startAddress;
+      mapArgs.endAddress = _endAddress;
+
       mapArgs.initialCenter = center;
       mapArgs.polylines = polylines;
       mapArgs.markers = markers;
@@ -325,7 +339,7 @@ class RouteStorage {
       polylineLngs.add(lngs);
     });
 
-    var toEncode = _routeJSON(_filename, _distance, _initialCenter.latitude,
+    var toEncode = _routeJSON(_routeName, _startAddress, _endAddress, _distance, _initialCenter.latitude,
         _initialCenter.longitude, polylineLats, polylineLngs);
 
     String jsonString = jsonEncode(toEncode);
@@ -350,25 +364,33 @@ class RouteStorage {
     final dirPath = await _getLocalDirPath;
 
     var fileList =
-    Directory(dirPath).listSync(recursive: true, followLinks: false);
+        Directory(dirPath).listSync(recursive: true, followLinks: false);
+    print("filelist (before) = " + fileList.toString());
 
     fileList.forEach((FileSystemEntity f) => f.deleteSync(recursive: false));
+
+    fileList = Directory(dirPath).listSync(recursive: true, followLinks: false);
+    print("filelist (after) = " + fileList.toString());
   }
 }
 
 class _routeJSON {
-  final String _name;
+  final String _routeName;
+  final String _startAddress;
+  final String _endAddress;
   final double _distance;
   final double _initialCenterLat;
   final double _initialCenterLng;
   final List<List<double>> _polylineLats;
   final List<List<double>> _polylineLngs;
 
-  _routeJSON(this._name, this._distance, this._initialCenterLat,
+  _routeJSON(this._routeName, this._startAddress, this._endAddress, this._distance, this._initialCenterLat,
       this._initialCenterLng, this._polylineLats, this._polylineLngs);
 
   Map<String, dynamic> toJson() => {
-        'name': this._name,
+        'routeName': this._routeName,
+        'startAddress': this._startAddress,
+        'endAddress' : this._endAddress,
         'distance': this._distance,
         'initialCenterLat': this._initialCenterLat,
         'initialCenterLng': this._initialCenterLng,
@@ -376,4 +398,3 @@ class _routeJSON {
         'polylinesLngs': this._polylineLngs,
       };
 }
-

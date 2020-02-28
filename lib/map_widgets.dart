@@ -19,8 +19,8 @@ class MapArguments {
   double distanceInKm = 0.0; //always stored as KM
   List<Marker> markers = [];
   List<Polyline> polylines = [];
-  double markerWidth = 8.0;
-  double markerHeight = 8.0;
+  double markerWidth = 10.0;
+  double markerHeight = 10.0;
   String beginningMarkerPath = 'assets/green_circle.png';
   String middleMarkerPath = 'assets/blue_circle.png';
   String endMarkerPath = 'assets/red_circle.png';
@@ -28,8 +28,33 @@ class MapArguments {
   double polylineStrokeWidth = 2.0;
 }
 
+class SavedMapArguments extends MapArguments {
+
+  String routeName;
+  String startAddress;
+  String endAddress;
+
+  MapArguments toMapArguments(){
+    MapArguments args = MapArguments();
+    args.initialCenter = this.initialCenter;
+    args.initialZoom = this.initialZoom;
+    args.distanceInKm = this.distanceInKm;
+    args.markers = this.markers;
+    args.polylines = this.polylines;
+    args.markerWidth = this.markerWidth;
+    args.markerHeight = this.markerHeight;
+    args.beginningMarkerPath = this.beginningMarkerPath;
+    args.middleMarkerPath = this.middleMarkerPath;
+    args.endMarkerPath = this.endMarkerPath;
+    args.polylineColor =  this.polylineColor;
+    args.polylineStrokeWidth = this.polylineStrokeWidth;
+
+    return args;
+  }
+}
+
 class MapWidgets extends StatefulWidget {
-  final ValueChanged<List<Polyline>> onPolylinesChanged;
+  ValueChanged<List<Polyline>> onPolylinesChanged;
   MapArguments mapArgs;
 
   MapWidgets(this.mapArgs, {this.onPolylinesChanged});

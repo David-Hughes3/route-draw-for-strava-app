@@ -11,16 +11,23 @@ import 'package:route_draw_for_strava/map_widgets.dart';
 import 'package:route_draw_for_strava/utility_widgets.dart';
 
 class RouteDrawWidget extends StatefulWidget {
+  MapArguments _mapArgs;
+  RouteDrawWidget(this._mapArgs);
+
   @override
-  _RouteDrawWidgetState createState() => _RouteDrawWidgetState();
+  _RouteDrawWidgetState createState() => _RouteDrawWidgetState(_mapArgs);
 }
 
 class _RouteDrawWidgetState extends State<RouteDrawWidget> {
   List<Polyline> _polylines = [];
+  MapArguments _mapArgs;
+
+  _RouteDrawWidgetState(this._mapArgs);
 
   @override
   void initState() {
     super.initState();
+    _polylines = _mapArgs.polylines;
   }
 
   void _toActivityInfo(BuildContext context) {
@@ -33,20 +40,18 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
   }
 
   void _saveRoute() {
-    String filename;
     if (_polylines.length < 1) {
       showPopupText(context, "Invalid Arguments",
           "What kind of route just has a starting point?");
       return;
     }
-    createAlertDialog(context, "Enter Route Name").then((String output) {
-      print(output);
-      if (output == null) {
+    createAlertDialog(context, "Enter Route Name").then((String routeName) {
+      print(routeName);
+      if (routeName == null) {
         print("save canceled");
         return;
       } else {
-        filename = output;
-        var storage = RouteStorage(filename + ".json", _polylines);
+        var storage = RouteStorage(routeName, _polylines);
         storage.writeRouteJSON().then((file) {
           //print(file.path);
           print(file.readAsStringSync());
@@ -74,7 +79,7 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
           ],
         ),
         body: Stack(children: <Widget>[
-          MapWidgets(MapArguments(), onPolylinesChanged: (newPolylines) {
+          MapWidgets(_mapArgs, onPolylinesChanged: (newPolylines) {
             _polylines = newPolylines;
           }),
           _completeDrawWidget(context),
