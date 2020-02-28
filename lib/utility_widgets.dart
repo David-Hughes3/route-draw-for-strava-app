@@ -36,3 +36,29 @@ void showPopupText(
     },
   );
 }
+
+///https://www.youtube.com/watch?v=FGfhnS6skMQ
+Future<String> createAlertDialog(BuildContext context, String titleString) {
+  TextEditingController customController = TextEditingController();
+
+  return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(titleString),
+          content: TextField(controller: customController),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Cancel'),
+              onPressed: () {Navigator.of(context).pop();},
+            ),
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Confirm'),
+              onPressed: () {Navigator.of(context).pop(customController.text.toString());},
+            ),
+          ],
+        );
+      });
+}

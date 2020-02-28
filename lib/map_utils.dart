@@ -11,6 +11,9 @@ import 'package:flutter_map/flutter_map.dart';
 
 import 'map_widgets.dart';
 
+import 'dart:async' show Future;
+import 'package:flutter/services.dart' show rootBundle;
+
 enum Units { KM, MI }
 
 class MapUtils {
@@ -211,26 +214,25 @@ class RouteStorage {
     _distance =
         MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
     _initialCenter = _polylines[0].points[0];
-
-
   }
 
-  Future<String> get _getLocalFilePath async {
+  static Future<String> get _getLocalDirPath async {
     String dir = (await getApplicationDocumentsDirectory()).path;
 
-    var folder = Directory('${dir}/saved_routes/');
+    var folder = Directory('$dir/saved_routes/');
 
-    if(await folder.exists()){ //if folder already exists return path
+    if (await folder.exists()) {
+      //if folder already exists return path
       return folder.path;
-    }else{//if folder not exists create folder and then return its path
+    } else {
+      //if folder not exists create folder and then return its path
       var newFolder = await folder.create(recursive: true);
       return newFolder.path;
     }
-
   }
 
   Future<File> get _localFile async {
-    final filePath = await _getLocalFilePath;
+    final filePath = await _getLocalDirPath;
     return File(filePath + _filename);
   }
 
@@ -245,16 +247,19 @@ class RouteStorage {
       Map json = jsonDecode(contents);
 
       List<List<double>> temp3 = [];
-      json['polylinesLats'].forEach((x) => temp3.add(x.cast<double>().toList()) );
+      json['polylinesLats']
+          .forEach((x) => temp3.add(x.cast<double>().toList()));
 
       String _name = json['name'] as String;
       double _distance = json['distance'] as double;
       double _initialCenterLat = json['initialCenterLat'] as double;
       double _initialCenterLng = json['initialCenterLng'] as double;
       List<List<double>> _polylineLats = [];
-      json['polylinesLats'].forEach((x) => _polylineLats.add(x.cast<double>().toList()) );
+      json['polylinesLats']
+          .forEach((x) => _polylineLats.add(x.cast<double>().toList()));
       List<List<double>> _polylineLngs = [];
-      json['polylinesLngs'].forEach((x) => _polylineLngs.add(x.cast<double>().toList()) );
+      json['polylinesLngs']
+          .forEach((x) => _polylineLngs.add(x.cast<double>().toList()));
 
       LatLng center = LatLng(_initialCenterLat, _initialCenterLng);
       List<Polyline> polylines = [];
@@ -328,6 +333,27 @@ class RouteStorage {
     // Write the file
     return file.writeAsString(jsonString);
   }
+
+  static Future<List<String>> getRoutePaths() async {
+    final dirPath = await _getLocalDirPath;
+    List<String> paths = [];
+
+    var fileList =
+        Directory(dirPath).listSync(recursive: true, followLinks: false);
+
+    fileList.forEach((FileSystemEntity f) => paths.add(f.path));
+
+    return paths;
+  }
+
+  static deleteRoutes() async {
+    final dirPath = await _getLocalDirPath;
+
+    var fileList =
+    Directory(dirPath).listSync(recursive: true, followLinks: false);
+
+    fileList.forEach((FileSystemEntity f) => f.deleteSync(recursive: false));
+  }
 }
 
 class _routeJSON {
@@ -341,14 +367,6 @@ class _routeJSON {
   _routeJSON(this._name, this._distance, this._initialCenterLat,
       this._initialCenterLng, this._polylineLats, this._polylineLngs);
 
-//  _routeJSON.fromJson(Map<String, dynamic> json)
-//      : _name = json['name'] as String,
-//        _distance = json['distance'] as double,
-//        _initialCenterLat = json['initialCenterLat'] as double,
-//        _initialCenterLng = json['initialCenterLng'] as double,
-//        _polylineLats = json['polylinesLats'].map((x) => x.cast<double>()).toList() as List<List<double>>,
-//        _polylineLngs = json['polylinesLngs'].map((x) => x.cast<double>()).toList() as List<List<double>>;
-
   Map<String, dynamic> toJson() => {
         'name': this._name,
         'distance': this._distance,
@@ -358,3 +376,4 @@ class _routeJSON {
         'polylinesLngs': this._polylineLngs,
       };
 }
+

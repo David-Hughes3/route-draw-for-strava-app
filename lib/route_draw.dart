@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:route_draw_for_strava/activity_info.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
 import 'package:route_draw_for_strava/map_widgets.dart';
+import 'package:route_draw_for_strava/utility_widgets.dart';
 
 class RouteDrawWidget extends StatefulWidget {
   @override
@@ -32,10 +33,27 @@ class _RouteDrawWidgetState extends State<RouteDrawWidget> {
   }
 
   void _saveRoute() {
-    var temp = RouteStorage("test.json", _polylines);
-    temp.writeRouteJSON().then((file) {
-      print(file.readAsStringSync());
-      //RouteStorage.readRouteFromFilepath(file.path, MapArguments()).then((args)=>print(args.distanceInKm.toString() + " " + MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(args.polylines)).toString()));
+    String filename;
+    if (_polylines.length < 1) {
+      showPopupText(context, "Invalid Arguments",
+          "What kind of route just has a starting point?");
+      return;
+    }
+    createAlertDialog(context, "Enter Route Name").then((String output) {
+      print(output);
+      if (output == null) {
+        print("save canceled");
+        return;
+      } else {
+        filename = output;
+        var storage = RouteStorage(filename + ".json", _polylines);
+        storage.writeRouteJSON().then((file) {
+          //print(file.path);
+          print(file.readAsStringSync());
+          //RouteStorage.readRouteFromFilepath(file.path, MapArguments()).then((args)=>print(args.distanceInKm.toString() + " " + MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(args.polylines)).toString()));
+        });
+      }
+      RouteStorage.getRoutePaths().then((List<String> lst) => print(lst));
     });
   }
 
