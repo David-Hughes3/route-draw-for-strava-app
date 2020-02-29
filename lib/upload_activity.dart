@@ -27,7 +27,7 @@ class _UploadActivityState extends State<UploadActivityWidget> {
   @override
   void initState() {
     super.initState();
-    GPXStorage().readRouteGPX().then((String file) => print(file));
+    GPXStorage().readRouteGPX().then((String file) => debugPrint(file, wrapWidth: 1024));
     StravaWrapper _strava = StravaWrapper();
     _strava
         .uploadActivity(_name, _desc, _gpxFilePath)

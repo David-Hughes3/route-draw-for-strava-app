@@ -48,22 +48,16 @@ class MapUtils {
   }
 
   //in Kilometers
-  static double _calcDistance(lat1, lon1, lat2, lon2) {
-    var p = 0.017453292519943295; // Math.PI / 180
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-
-    return 12742 * asin(sqrt(a)); // 2 * R; R = 6371 km
+  static double _calcDistance(LatLng point1, LatLng point2) {
+    Distance distance = new DistanceVincenty(roundResult: false);
+    return distance.as(LengthUnit.Kilometer, point1, point2);
   }
 
   //in Kilometers
   static double _calcTotalDistance(List<LatLng> input) {
     double total = 0.0;
     for (int i = 0; i < input.length - 1; i++) {
-      total += _calcDistance(input[i].latitude, input[i].longitude,
-          input[i + 1].latitude, input[i + 1].longitude);
+      total += _calcDistance(input[i], input[i + 1]);
     }
     return total;
   }
@@ -103,7 +97,6 @@ class MapUtils {
 
   static Future<File> toGPXFile(
       List<LatLng> coords, DateTime start, DateTime elapsed) async {
-
     DateTime startDateTimeInUtc = start.toUtc();
 
     //calc the total time
@@ -117,11 +110,7 @@ class MapUtils {
     //calculate distance per segment and total distance from passed LatLngs
     List<double> distancePerSegment = [];
     for (int i = 0; i < coords.length - 1; i++) {
-      distancePerSegment.add(_calcDistance(
-          coords[i].latitude,
-          coords[i].longitude,
-          coords[i + 1].latitude,
-          coords[i + 1].longitude));
+      distancePerSegment.add(_calcDistance(coords[i], coords[i + 1]));
     }
     double distanceSum = distancePerSegment.fold(
         0, (p, c) => p + c); //sum as in a functional manner
@@ -148,8 +137,8 @@ class MapUtils {
     String segments = "";
     DateFormat df = new DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     for (int i = 0; i < coords.length; i++) {
-      var newTime =
-          df.format(startDateTimeInUtc.add(new Duration(seconds: timePerSegmentCDF[i])));
+      var newTime = df.format(
+          startDateTimeInUtc.add(new Duration(seconds: timePerSegmentCDF[i])));
       segments += "<trkpt lat=\"" +
           coords[i].latitude.toString() +
           "\" lon=\"" +
