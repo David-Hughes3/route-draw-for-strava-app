@@ -21,7 +21,7 @@ class MapUtils {
   factory MapUtils() => _instance ??= new MapUtils._();
   MapUtils._();
 
-  static Units _whichUnit = Units.KM;
+  static Units _whichUnit = Units.MI;
 
   static void setUnits(Units input) {
     _whichUnit = input;
