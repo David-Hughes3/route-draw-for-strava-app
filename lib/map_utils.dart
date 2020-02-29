@@ -8,11 +8,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:route_draw_for_strava/map_box_request.dart';
 
 import 'map_widgets.dart';
 
 import 'dart:async' show Future;
-import 'package:flutter/services.dart' show rootBundle;
 
 enum Units { KM, MI }
 
@@ -205,23 +205,19 @@ class RouteStorage {
   String _routeName;
   String _filename;
   List<Polyline> _polylines;
-  double _distance;
+  double _distanceInKm;
   LatLng _initialCenter;
   String _startAddress;
-  String _endAddress;
+  String _endAddress = "None";
 
   RouteStorage(routeName, polylines) {
     _routeName = routeName;
     _filename = routeName + ".json";
     _polylines = polylines;
 
-    _distance =
-        MapUtils.calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
+    _distanceInKm =
+        MapUtils._calcTotalDistance(MapUtils.polylinesToLatLngs(_polylines));
     _initialCenter = _polylines[0].points[0];
-
-    ///TODO add latlngTolocation utility
-    _startAddress = "Default, Loc";
-    _endAddress = "Default, EndLoc";
   }
 
   static Future<String> get _getLocalDirPath async {
@@ -261,7 +257,7 @@ class RouteStorage {
       String _routeName = json['routeName'] as String;
       String _startAddress = json['startAddress'] as String;
       String _endAddress = json['endAddress'] as String;
-      double _distance = json['distance'] as double;
+      double _distanceInKm = json['distanceInKm'] as double;
       double _initialCenterLat = json['initialCenterLat'] as double;
       double _initialCenterLng = json['initialCenterLng'] as double;
       List<List<double>> _polylineLats = [];
@@ -313,7 +309,7 @@ class RouteStorage {
       mapArgs.initialCenter = center;
       mapArgs.polylines = polylines;
       mapArgs.markers = markers;
-      mapArgs.distanceInKm = _distance;
+      mapArgs.distanceInKm = _distanceInKm;
 
       return mapArgs;
     } catch (e) {
@@ -339,8 +335,18 @@ class RouteStorage {
       polylineLngs.add(lngs);
     });
 
-    var toEncode = _routeJSON(_routeName, _startAddress, _endAddress, _distance, _initialCenter.latitude,
-        _initialCenter.longitude, polylineLats, polylineLngs);
+    _startAddress = await MapBoxRequest.makeLocationRequest(
+        _initialCenter, FeatureType.NEIGHBORHOOD);
+
+    var toEncode = _routeJSON(
+        _routeName,
+        _startAddress,
+        _endAddress,
+        _distanceInKm,
+        _initialCenter.latitude,
+        _initialCenter.longitude,
+        polylineLats,
+        polylineLngs);
 
     String jsonString = jsonEncode(toEncode);
 
@@ -378,20 +384,27 @@ class _routeJSON {
   final String _routeName;
   final String _startAddress;
   final String _endAddress;
-  final double _distance;
+  final double _distanceInKm;
   final double _initialCenterLat;
   final double _initialCenterLng;
   final List<List<double>> _polylineLats;
   final List<List<double>> _polylineLngs;
 
-  _routeJSON(this._routeName, this._startAddress, this._endAddress, this._distance, this._initialCenterLat,
-      this._initialCenterLng, this._polylineLats, this._polylineLngs);
+  _routeJSON(
+      this._routeName,
+      this._startAddress,
+      this._endAddress,
+      this._distanceInKm,
+      this._initialCenterLat,
+      this._initialCenterLng,
+      this._polylineLats,
+      this._polylineLngs);
 
   Map<String, dynamic> toJson() => {
         'routeName': this._routeName,
         'startAddress': this._startAddress,
-        'endAddress' : this._endAddress,
-        'distance': this._distance,
+        'endAddress': this._endAddress,
+        'distanceInKm': this._distanceInKm,
         'initialCenterLat': this._initialCenterLat,
         'initialCenterLng': this._initialCenterLng,
         'polylinesLats': this._polylineLats,

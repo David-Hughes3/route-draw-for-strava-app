@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:route_draw_for_strava/map_box_request.dart';
 
 import 'package:route_draw_for_strava/secret.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
@@ -24,17 +25,16 @@ class MapArguments {
   String beginningMarkerPath = 'assets/green_circle.png';
   String middleMarkerPath = 'assets/blue_circle.png';
   String endMarkerPath = 'assets/red_circle.png';
-  Color polylineColor =  Colors.blue;
+  Color polylineColor = Colors.blue;
   double polylineStrokeWidth = 2.0;
 }
 
 class SavedMapArguments extends MapArguments {
-
   String routeName;
   String startAddress;
   String endAddress;
 
-  MapArguments toMapArguments(){
+  MapArguments toMapArguments() {
     MapArguments args = MapArguments();
     args.initialCenter = this.initialCenter;
     args.initialZoom = this.initialZoom;
@@ -46,7 +46,7 @@ class SavedMapArguments extends MapArguments {
     args.beginningMarkerPath = this.beginningMarkerPath;
     args.middleMarkerPath = this.middleMarkerPath;
     args.endMarkerPath = this.endMarkerPath;
-    args.polylineColor =  this.polylineColor;
+    args.polylineColor = this.polylineColor;
     args.polylineStrokeWidth = this.polylineStrokeWidth;
 
     return args;
@@ -110,7 +110,7 @@ class _MapWidgetsState extends State<MapWidgets> {
     _beginningMarkerPath = args.beginningMarkerPath;
     _middleMarkerPath = args.middleMarkerPath;
     _endMarkerPath = args.endMarkerPath;
-    _polylineColor =  args.polylineColor;
+    _polylineColor = args.polylineColor;
     _polylineStrokeWidth = args.polylineStrokeWidth;
   }
 
@@ -156,13 +156,8 @@ class _MapWidgetsState extends State<MapWidgets> {
       if (_curNavType == _navType.LINE) {
         coords = [originPoint, destPoint];
       } else if (_curNavType == _navType.WALK) {
-        //TODO Enable charging on key?
-//        coords = await _googleMapPolyline.getCoordinatesWithLocation(
-//            origin: originPoint,
-//            destination: destPoint,
-//            mode: RouteMode.walking);
-        //TODO remove
-        coords = [originPoint, destPoint];
+        coords =
+            await MapBoxRequest.makeNavigationRequest(originPoint, destPoint);
       }
     }
 

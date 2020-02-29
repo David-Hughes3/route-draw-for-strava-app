@@ -37,9 +37,9 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
             _allMapArgs.add(mapArgI);
             Color newColor;
             if (altColor)
-              newColor = Colors.deepOrangeAccent;
+              newColor = Colors.deepOrange[100];
             else
-              newColor = Colors.deepOrange;
+              newColor = Colors.deepOrange[300];
             altColor = !altColor;
             _colors.add(newColor);
           });
@@ -55,12 +55,12 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
           builder: (context) => RouteDrawWidget(args),
         ));
   }
-  
+
   String _processDistance(double distanceInKm) {
     double distance = distanceInKm;
-    if(MapUtils.getUnits() == Units.MI)
+    if (MapUtils.getUnits() == Units.MI)
       distance = MapUtils.kilometersToMiles(distanceInKm);
-    
+
     return '${distance.toStringAsFixed(2)} ${MapUtils.getUnitsAsString()}';
   }
 
@@ -73,7 +73,10 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
           IconButton(
               icon: const Icon(Icons.delete_sweep),
               tooltip: 'Delete All',
-              onPressed: () {RouteStorage.deleteRoutes(); Navigator.of(context).pop();}),
+              onPressed: () {
+                RouteStorage.deleteRoutes();
+                Navigator.of(context).pop();
+              }),
           IconButton(
               icon: const Icon(Icons.check),
               tooltip: 'Next page',
@@ -87,14 +90,32 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
           return Container(
             height: MediaQuery.of(context).size.height * 0.1,
             child: RaisedButton(
-              onPressed: () => _toRouteDraw(context, _allMapArgs[index].toMapArguments()),
+              onPressed: () =>
+                  _toRouteDraw(context, _allMapArgs[index].toMapArguments()),
               color: _colors[index],
-              child: Text(
-                'Route Name: ${_allMapArgs[index].routeName}\n ${_allMapArgs[index].startAddress}; ${_processDistance(_allMapArgs[index].distanceInKm)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16.0,
-                ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Route: ${_allMapArgs[index].routeName}\nPlace: ${_allMapArgs[index].startAddress.split(",").first}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      '${_processDistance(_allMapArgs[index].distanceInKm)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
