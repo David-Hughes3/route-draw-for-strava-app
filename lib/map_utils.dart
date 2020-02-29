@@ -103,6 +103,9 @@ class MapUtils {
 
   static Future<File> toGPXFile(
       List<LatLng> coords, DateTime start, DateTime elapsed) async {
+
+    DateTime startDateTimeInUtc = start.toUtc();
+
     //calc the total time
     //datetime picker does not have a duration picker, so the date portion of the passed elapsed is useless/should be ignored
     int totalTime = Duration(
@@ -146,7 +149,7 @@ class MapUtils {
     DateFormat df = new DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     for (int i = 0; i < coords.length; i++) {
       var newTime =
-          df.format(start.add(new Duration(seconds: timePerSegmentCDF[i])));
+          df.format(startDateTimeInUtc.add(new Duration(seconds: timePerSegmentCDF[i])));
       segments += "<trkpt lat=\"" +
           coords[i].latitude.toString() +
           "\" lon=\"" +
