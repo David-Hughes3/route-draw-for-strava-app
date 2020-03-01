@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:strava_flutter/Models/fault.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:route_draw_for_strava/strava_wrapper.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
@@ -46,7 +47,8 @@ class _UploadActivityState extends State<UploadActivityWidget> {
         body: Stack(
           children: <Widget>[
             Center(
-              child: Text('Status: $_status',
+              child: AutoSizeText('Status: $_status',
+                  maxLines: 1,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 32.0,

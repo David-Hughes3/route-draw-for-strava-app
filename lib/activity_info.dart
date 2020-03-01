@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:latlong/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:route_draw_for_strava/upload_activity.dart';
 import 'map_utils.dart';
@@ -78,7 +79,8 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
         ),
         body: ListView(padding: EdgeInsets.all(15.0), children: <Widget>[
           Center(
-            child: Text('Enter Activity Info',
+            child: AutoSizeText('Enter Activity Info',
+                maxLines: 1,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 32.0,
@@ -88,7 +90,8 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.05,
           ),
-          Text('Activity Title',
+          AutoSizeText('Activity Title',
+              maxLines: 1,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 24.0,
@@ -116,7 +119,8 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child:
-                      Text('Distance: ${_distance.toStringAsFixed(2)} $_units ',
+                      AutoSizeText('Distance: ${_distance.toStringAsFixed(2)} $_units ',
+                          maxLines: 1,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24.0,
@@ -132,7 +136,7 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('Edit'),
+                    child: AutoSizeText('Edit'),
                   ),
                 ),
               )
@@ -156,8 +160,9 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                   });
                 }, currentTime: _startDateTime, locale: LocaleType.en);
               },
-              child: Text(
+              child: AutoSizeText(
                 'Start date-time: ${new DateFormat("MM/dd/yy h:mm a").format(_startDateTime)}',
+                maxLines: 1,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 20.0,
@@ -180,8 +185,9 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
                   currentTime: _elapsedTime,
                 );
               },
-              child: Text(
+              child: AutoSizeText(
                 'Elapsed Time: ${new DateFormat("HH:mm:ss").format(_elapsedTime)}',
+                maxLines: 1,
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 20.0,
@@ -190,7 +196,8 @@ class _ActivityInfoState extends State<ActivityInfoWidget> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.05,
           ),
-          Text('Description',
+          AutoSizeText('Description',
+              maxLines: 1,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 24.0,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:route_draw_for_strava/strava_wrapper.dart';
 import 'package:route_draw_for_strava/utility_widgets.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
@@ -40,7 +42,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   child: Text('Manage Strava',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 24.0,
+                        fontSize: 32.0,
                         fontFamily: 'Roboto',
                       )))),
           Visibility(
@@ -68,7 +70,12 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   padding: EdgeInsets.all(20.0),
                   textColor: Colors.white,
                   color: Colors.red[800],
-                  child: Text('Deauthorize'),
+                  child: AutoSizeText('Deauthorize',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        fontFamily: 'Roboto',
+                      )),
                   onPressed: () async {
                     await _strava.deauthorize();
                     await _updateButton();
@@ -82,7 +89,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   child: Text('Select Units',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
+                        fontSize: 28.0,
                         fontFamily: 'Roboto',
                       )))),
           Expanded(
@@ -95,17 +102,20 @@ class _SettingsWidgetState extends State<SettingsWidget> {
               flex: 1,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child:
-                    Image.asset("assets/mapbox-logo-black.png", height: MediaQuery.of(context).size.height * 0.05,),
+                child: Image.asset(
+                  "assets/mapbox-logo-black.png",
+                  height: MediaQuery.of(context).size.height * 0.05,
+                ),
               )),
           Expanded(
               flex: 1,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child:
-                Image.asset("assets/api_logo_pwrdBy_strava_horiz_gray.png", height: MediaQuery.of(context).size.height * 0.1,),
+                child: Image.asset(
+                  "assets/api_logo_pwrdBy_strava_horiz_gray.png",
+                  height: MediaQuery.of(context).size.height * 0.1,
+                ),
               )),
-
         ],
       );
   }

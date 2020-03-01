@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:route_draw_for_strava/activity_info.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
@@ -87,6 +88,7 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
         padding: const EdgeInsets.all(8),
         itemCount: _allMapArgs.length,
         itemBuilder: (BuildContext context, int index) {
+          var routeGroup = AutoSizeGroup();
           return Container(
             height: MediaQuery.of(context).size.height * 0.1,
             child: RaisedButton(
@@ -97,21 +99,56 @@ class _LoadRouteWidgetState extends State<LoadRouteWidget> {
                 children: <Widget>[
                   Expanded(
                     flex: 2,
-                    child: Text(
-                      'Route: ${_allMapArgs[index].routeName}\nPlace: ${_allMapArgs[index].startAddress.split(",").first}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
-                      ),
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 1,
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: AutoSizeText(
+                              'Route: ${_allMapArgs[index].routeName}',
+                              maxLines: 1,
+                              minFontSize: 18,
+                              group: routeGroup,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: AutoSizeText(
+                              'Place: ${_allMapArgs[index].startAddress.split(",").first}',
+                              maxLines: 1,
+                              minFontSize: 18,
+                              group: routeGroup,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Expanded(
                     flex: 1,
-                    child: Text(
-                      '${_processDistance(_allMapArgs[index].distanceInKm)}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: AutoSizeText(
+                        '${_processDistance(_allMapArgs[index].distanceInKm)}',
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
                       ),
                     ),
                   ),
