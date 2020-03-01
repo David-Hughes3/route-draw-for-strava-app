@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="route_draw_for_strava"
+        android:label="RouteDraw"
         android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
