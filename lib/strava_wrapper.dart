@@ -1,19 +1,12 @@
-import 'secret.dart';
-
 //https://pub.dev/packages/strava_flutter#-readme-tab-
 import 'package:strava_flutter/strava.dart';
 import 'package:strava_flutter/Models/detailedAthlete.dart';
-// Used by uploadExample
-import 'package:strava_flutter/strava.dart';
 import 'package:strava_flutter/Models/fault.dart';
-import 'package:strava_flutter/Models/stats.dart'; // Test
-import 'package:strava_flutter/errorCodes.dart';
 import 'package:strava_flutter/errorCodes.dart' as error;
-
 import 'package:strava_flutter/Models/token.dart';
 import 'package:strava_flutter/API/Oauth.dart';
 
-import 'package:strava_flutter/globals.dart';
+import 'secret.dart';
 
 class AccessAuth extends Auth {}
 
@@ -69,7 +62,7 @@ class StravaWrapper {
     // need to get authorized before (valid token)
     var _strava = Strava(true, secret);
 
-    var fault = await _strava.deAuthorize();
+    await _strava.deAuthorize();
   }
 
   /// Return true the expiry date is passed

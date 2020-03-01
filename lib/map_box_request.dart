@@ -2,7 +2,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:latlong/latlong.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:route_draw_for_strava/secret.dart';
 

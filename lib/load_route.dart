@@ -1,16 +1,11 @@
-import 'dart:io';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
-import 'package:flutter_map/flutter_map.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-import 'package:route_draw_for_strava/activity_info.dart';
+
 import 'package:route_draw_for_strava/map_utils.dart';
 import 'package:route_draw_for_strava/map_widgets.dart';
 import 'package:route_draw_for_strava/route_draw.dart';
-import 'package:route_draw_for_strava/utility_widgets.dart';
 
 class LoadRouteWidget extends StatefulWidget {
   @override
@@ -20,7 +15,6 @@ class LoadRouteWidget extends StatefulWidget {
 class _LoadRouteWidgetState extends State<LoadRouteWidget> {
   List<String> _routePaths = [];
   List<SavedMapArguments> _allMapArgs = [];
-  String _units = MapUtils.getUnitsAsString();
 
   final List<Color> _colors = [];
   bool altColor = true;

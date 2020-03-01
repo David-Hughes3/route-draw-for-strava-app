@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -11,7 +8,7 @@ import 'package:route_draw_for_strava/map_widgets.dart';
 import 'package:route_draw_for_strava/utility_widgets.dart';
 
 class RouteDrawWidget extends StatefulWidget {
-  MapArguments _mapArgs;
+  final MapArguments _mapArgs;
   RouteDrawWidget(this._mapArgs);
 
   @override

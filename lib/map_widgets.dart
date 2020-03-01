@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:route_draw_for_strava/map_box_request.dart';
 
@@ -54,8 +53,8 @@ class SavedMapArguments extends MapArguments {
 }
 
 class MapWidgets extends StatefulWidget {
-  ValueChanged<List<Polyline>> onPolylinesChanged;
-  MapArguments mapArgs;
+  final ValueChanged<List<Polyline>> onPolylinesChanged;
+  final MapArguments mapArgs;
 
   MapWidgets(this.mapArgs, {this.onPolylinesChanged});
 

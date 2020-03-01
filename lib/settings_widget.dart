@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:route_draw_for_strava/strava_wrapper.dart';
-import 'package:route_draw_for_strava/utility_widgets.dart';
 import 'package:route_draw_for_strava/map_utils.dart';
 
 class SettingsWidget extends StatefulWidget {
@@ -57,7 +54,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                     padding: EdgeInsets.all(0.0),
                     onPressed: () async {
                       await _strava.authorize();
-                      await _updateButton();
+                      _updateButton();
                     },
                   ))),
           Visibility(
@@ -78,7 +75,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                       )),
                   onPressed: () async {
                     await _strava.deauthorize();
-                    await _updateButton();
+                    _updateButton();
                   },
                 )),
               )),

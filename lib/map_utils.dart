@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:io';
 import 'dart:convert';
 
@@ -330,7 +329,7 @@ class RouteStorage {
     _startAddress = await MapBoxRequest.makeLocationRequest(
         _initialCenter, FeatureType.NEIGHBORHOOD);
 
-    var toEncode = _routeJSON(
+    var toEncode = _RouteJSON(
         _routeName,
         _startAddress,
         _endAddress,
@@ -372,7 +371,7 @@ class RouteStorage {
   }
 }
 
-class _routeJSON {
+class _RouteJSON {
   final String _routeName;
   final String _startAddress;
   final String _endAddress;
@@ -382,7 +381,7 @@ class _routeJSON {
   final List<List<double>> _polylineLats;
   final List<List<double>> _polylineLngs;
 
-  _routeJSON(
+  _RouteJSON(
       this._routeName,
       this._startAddress,
       this._endAddress,
